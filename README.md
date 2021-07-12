@@ -15,7 +15,7 @@ now we can use the git command from command prompt and powershell.
 Just google install instructions
 
 ### Windows Terminal
-A wrapper for all the CLI that you need in Windows
+A wrapper for all the CLI that you need in Windows  
 https://docs.microsoft.com/en-us/windows/terminal/get-started
 
 ## Configurations
