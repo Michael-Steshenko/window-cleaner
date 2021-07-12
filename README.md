@@ -11,6 +11,13 @@ Git CSM automatically installs git bash and git GUI, which I don't need, instead
 ```scoop install mingit```  
 now we can use the git command from command prompt and powershell.
 
+### WSL 2
+Just google install instructions
+
+### Windows Terminal
+A wrapper for all the CLI that you need in Windows
+https://docs.microsoft.com/en-us/windows/terminal/get-started
+
 ## Configurations
 
 ### Setting up enviorment variables in WSL
