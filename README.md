@@ -36,7 +36,7 @@ I use this for remapping keyboard shortcuts that windows does not let me remap o
 - $ source ~/.bashrc will load your recent changes into your current shell.
 
 ### Disabling windows magnifier
-I was unable to disable the win + "+" and win + "-" shortcuts, even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
+I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Preview), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
 - run Command Prompt (Admin)
 - Run the following two commands to change the ownership of the Magnify.exe app and grant full permissions to Administrators. Without this step you’re unable to rename or make any change to the Magnify.exe file.  
 ```takeown /f C:\Windows\System32\Magnify.exe```  
