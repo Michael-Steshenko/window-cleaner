@@ -4,7 +4,7 @@ A place for me to keep a set of tools, configurations and installation instructi
 ## Tools
 
 ### Scoop
-Scoop is a windows command line package manager, for installation refer: https://scoop.sh/
+Scoop is a windows command line package manager, for installation refer: https://scoop.sh
 
 ### MinGit
 Git CSM automatically installs git bash and git GUI, which I don't need, instead I use Scoop package manager to install MinGit:  
@@ -24,7 +24,7 @@ Microsoft PowerToys is a set of utilities for power users to tune and streamline
 I use this for remapping keyboard shortcuts that windows does not let me remap or disable and for FancyZones - a windows window layout manager.
 
 ### AutoHotKey
-Automation scripting language for Windows.  
+Automation scripting language for Windows. https://www.autohotkey.com  
 I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page to quickly switch between bluetooth audio output devices.   
 See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview)  
 To make AHK scrips or any other file launch on Windows startup for all users:  
