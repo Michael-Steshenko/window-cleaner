@@ -16,7 +16,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; If you don't reach that page, you may try to increase Sleep time, to let Settings app fully load, this 
 #b::
 	run explorer.exe ms-settings:bluetooth
-	Sleep 600
+	Sleep 700
 	Send, {Tab}
 	Send, {Enter}
 Return
