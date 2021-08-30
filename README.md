@@ -26,7 +26,10 @@ I use this for remapping keyboard shortcuts that windows does not let me remap o
 ### AutoHotKey
 Automation scripting language for Windows.  
 I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page to quickly switch between bluetooth audio output devices.   
-See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview)
+See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview)  
+To make AHK scrips or any other file launch on Windows startup for all users:  
+- Press Win+R to open the Run dialog and type ```shell:common startup``` this will open a folder from which programs are launched at startup  
+- place the AHK script or shortcut to the AHK script in that folder
 
 ## Configurations
 
