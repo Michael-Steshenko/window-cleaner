@@ -25,7 +25,7 @@ I use this for remapping keyboard shortcuts that windows does not let me remap o
 
 ### AutoHotKey
 Automation scripting language for Windows.  
-I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page.  
+I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page to quickly switch between bluetooth audio output devices.   
 See Bluetooth-Devices.ahk in this repository.
 
 ## Configurations
