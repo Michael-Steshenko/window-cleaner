@@ -23,6 +23,11 @@ https://docs.microsoft.com/en-us/windows/terminal/get-started
 Microsoft PowerToys is a set of utilities for power users to tune and streamline their Windows 10 experience for greater productivity.
 I use this for remapping keyboard shortcuts that windows does not let me remap or disable and for FancyZones - a windows window layout manager.
 
+### AutoHotKey
+Automation scripting language for Windows.  
+I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page.  
+See Bluetooth-Devices.ahk in this repository.
+
 ## Configurations
 
 ### Setting up enviorment variables in WSL
@@ -42,3 +47,5 @@ I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Previe
 ```takeown /f C:\Windows\System32\Magnify.exe```  
 ```cacls C:\Windows\System32\Magnify.exe /G administrators:F```  
 - Open your File Explorer and go to your system directory: C:\Windows\System32. locate the Magnify.exe file. Right-click on it and rename the filename to Magnify.exe.bak.
+
+###
