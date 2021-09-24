@@ -1,4 +1,4 @@
-﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
@@ -13,8 +13,9 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; Windows Key	#
 
 ; win+b open blutooth settings, and backout using key inputs to the screen that lets you connect to a paired device with one click
-; If you don't reach that page, you may try to increase Sleep time, to let Settings app fully load, this 
+; If you don't reach that page, you may try to increase Sleep time, to let Settings app fully load
 #b::
+	Process,Close,SystemSettings.exe
 	run explorer.exe ms-settings:bluetooth
 	Sleep 700
 	Send, {Tab}
