@@ -17,7 +17,19 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #b::
 	Process,Close,SystemSettings.exe
 	run explorer.exe ms-settings:bluetooth
-	Sleep 700
+	
+	Sleep 1000		
+
 	Send, {Tab}
+	Sleep 10
+	Send, {Enter}
+	Sleep 200	
+	
+	; send shift + tab
+	Send, {Shift down}
+	Send, {Tab}
+	Send, {Shift up}
+	Sleep 10	
+
 	Send, {Enter}
 Return
