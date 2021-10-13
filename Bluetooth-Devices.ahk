@@ -12,8 +12,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; Shift		+
 ; Windows Key	#
 
-; win+b open blutooth settings, and backout using key inputs to the screen that lets you connect to a paired device with one click
-; If you don't reach that page, you may try to increase Sleep time, to let Settings app fully load
+; win+b - open blutooth settings, and connect to the first blutooth device (untested with multiple blutooth devices connected)
+; If the script doesn't navigate correctly or doesn't connect to the blutooth device, you may want to try increasing Sleep times
 #b::
 	Process,Close,SystemSettings.exe
 	run explorer.exe ms-settings:bluetooth
@@ -33,3 +33,4 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 	Send, {Enter}
 Return
+
