@@ -26,7 +26,7 @@ I use this for remapping keyboard shortcuts that windows does not let me remap o
 ### AutoHotKey
 Automation scripting language for Windows. https://www.autohotkey.com  
 I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page to quickly switch between bluetooth audio output devices.   
-See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview)  
+See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview, need to update behavior for non preview builds)  
 To make AHK scrips or any other file launch on Windows startup for all users:  
 - Press Win+R to open the Run dialog and type ```shell:common startup``` this will open a folder from which programs are launched at startup  
 - place the AHK script or shortcut to the AHK script in that folder
@@ -44,7 +44,7 @@ To make AHK scrips or any other file launch on Windows startup for all users:
 - $ source ~/.bashrc will load your recent changes into your current shell.
 
 ### Disabling windows magnifier
-I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Preview), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
+I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterprise OS build: 22000.675), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
 - run Command Prompt (Admin)
 - Run the following two commands to change the ownership of the Magnify.exe app and grant full permissions to Administrators. Without this step you’re unable to rename or make any change to the Magnify.exe file.  
 ```takeown /f C:\Windows\System32\Magnify.exe```  
