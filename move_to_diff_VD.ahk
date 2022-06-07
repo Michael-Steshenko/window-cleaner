@@ -23,8 +23,8 @@ VD.init()
 return
 
 ; Move window
-;ctrl + shift + left
-^+Left::
+;win + alt + left
+#!Left::
 n := VD.getCurrentDesktopNum()
 if n = 1
 {
@@ -34,8 +34,8 @@ n -= 1
 VD.MoveWindowToDesktopNum("A",n)
 Return
 
-;ctrl + shift + right
-^+Right::
+;win + alt + right
+#!Right::
 n := VD.getCurrentDesktopNum()
 if n = % VD.getCount()
 {
@@ -46,8 +46,8 @@ VD.MoveWindowToDesktopNum("A",n)
 Return
 
 ; Move window and switch VD
-;ctrl + Win + shift + left
-^#+Left::
+;ctrl + Win + alt + left
+^#!Left::
 n := VD.getCurrentDesktopNum()
 if n = 1
 {
@@ -57,8 +57,8 @@ n -= 1
 VD.MoveWindowToDesktopNum("A",n), VD.goToDesktopNum(n)
 Return
 
-;ctrl + Win + shift + right
-^#+Right::
+;ctrl + Win + alt + right
+^#!Right::
 n := VD.getCurrentDesktopNum()
 if n = % VD.getCount()
 {
