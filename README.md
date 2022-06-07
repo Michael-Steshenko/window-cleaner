@@ -8,7 +8,7 @@ Scoop is a windows command line package manager, for installation refer: https:/
 
 ### MinGit
 Git CSM automatically installs git bash and git GUI, which I don't need, instead I use Scoop package manager to install MinGit:  
-```scoop install mingit```  
+`scoop install mingit`  
 now we can use the git command from command prompt and powershell.
 
 ### WSL 2
@@ -28,8 +28,15 @@ Automation scripting language for Windows. https://www.autohotkey.com
 I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page to quickly switch between bluetooth audio output devices.   
 See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview, need to update behavior for non preview builds)  
 To make AHK scrips or any other file launch on Windows startup for all users:  
-- Press Win+R to open the Run dialog and type ```shell:common startup``` this will open a folder from which programs are launched at startup  
+- Press Win+R to open the Run dialog and type `shell:common startup` this will open a folder from which programs are launched at startup  
 - place the AHK script or shortcut to the AHK script in that folder
+
+`move_to_diff_VD.ahk` allows moving windows to adjecent virtual desktops via keyboard shortcuts, but it has to import `_VD.ahk`.   
+Importing a file that's located in `shell:common startup` doesn't work.   
+If you want this script to run on startup you need to:
+- place `move_to_diff_VD.ahk` in `shell:common startup` like described before.
+- place `_VD.ahk` in some other folder for example `C:\Users\<my user>\Documents`
+- change import path inside `move_to_diff_VD.ahk` to be `C:\Users\<my user>\Documents\_VD.ahk`
 
 ## Configurations
 
