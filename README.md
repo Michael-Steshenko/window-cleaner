@@ -50,6 +50,12 @@ If you want this script to run on startup you need to:
 - Enter :wq and press enter . This will save and close the file.
 - $ source ~/.bashrc will load your recent changes into your current shell.
 
+### Better PowerShell autocomplete command history
+Tested with PS7, this configuration is for [all powershell users for all hosts](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.4#profile-types-and-locations)
+- `nvim $PSHOME\Profile.ps1`
+- add this line: `Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView`
+- restart powershell
+
 ### Disabling windows magnifier
 I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterprise OS build: 22000.675), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
 - run Command Prompt (Admin)
