@@ -6,6 +6,9 @@ A place for me to keep a set of tools, configurations and installation instructi
 ### Scoop
 Scoop is a windows command line package manager, for installation refer: https://scoop.sh
 
+### Neo Vim
+`scoop install nvim`
+
 ### MinGit
 Git CSM automatically installs git bash and git GUI, which I don't need, instead I use Scoop package manager to install MinGit:  
 `scoop install mingit`  
