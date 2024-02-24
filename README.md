@@ -62,9 +62,7 @@ Tested with PS7, this configuration is for [all powershell users for all hosts](
 ### Disabling windows magnifier
 I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterprise OS build: 22000.675), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
 - run Command Prompt (Admin)
-- Run the following two commands to change the ownership of the Magnify.exe app and grant full permissions to Administrators. Without this step you’re unable to rename or make any change to the Magnify.exe file.  
-```takeown /f C:\Windows\System32\Magnify.exe```  
-```cacls C:\Windows\System32\Magnify.exe /G administrators:F```  
-- Open your File Explorer and go to your system directory: C:\Windows\System32. locate the Magnify.exe file. Right-click on it and rename the filename to Magnify.exe.bak.
-
-###
+- Run the following commands to change the ownership of the Magnify.exe app and grant full permissions to Administrators and rename it. Without these steps you’re unable to rename or make any change to the Magnify.exe file.
+- `takeown /f C:\Windows\System32\Magnify.exe`  
+- `cacls C:\Windows\System32\Magnify.exe /G administrators:F`  
+- `mv C:\Windows\System32\Magnify.exe C:\Windows\System32\Magnify.exe.bak`
