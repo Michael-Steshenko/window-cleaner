@@ -25,6 +25,8 @@ https://docs.microsoft.com/en-us/windows/terminal/get-started
 ### PowerToys
 Microsoft PowerToys is a set of utilities for power users to tune and streamline their Windows 10 experience for greater productivity.
 I use this for remapping keyboard shortcuts that windows does not let me remap or disable and for FancyZones - a windows window layout manager.
+The [config](./powertoys_config.ptb) file is in the repository: 
+Check my [test document](./abc/test.md)!
 
 ### AutoHotKey
 Automation scripting language for Windows. https://www.autohotkey.com  
