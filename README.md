@@ -18,8 +18,17 @@ now we can use the git command from command prompt and powershell.
 Windows subsystem for linux  
 Just google install instructions
 
+### VSCode WSL extension
+This lets you run VS Code’s UI on Windows, and all your commands, extensions, and even the terminal, run on Linux.  
+- Install the WSL extension in VS code.  
+- Configure the WSL version of git, to use the windows version of git credential manager.  
+(this allows you to sign in through the browsers and remembers your credentials)  
+If you use mingit the command will look something like this:  
+`git config --global credential.helper "/mnt/c/Users/Michael/scoop/apps/mingit/2.37.3.windows.1/mingw64/bin/git-credential-manager-core.exe"`  
+taken from [here](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md#configuring-wsl-with-git-for-windows-recommended)
+
 ### Windows Terminal
-A wrapper for all the CLI that you need in Windows  
+A wrapper for all the CLI that you need in Windows.
 https://docs.microsoft.com/en-us/windows/terminal/get-started
 
 ### PowerToys
