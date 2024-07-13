@@ -73,6 +73,11 @@ Tested with PS7, this configuration is for [all powershell users for all hosts](
 - add this line: `Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView`
 - restart powershell
 
+### Disable Microsoft "log in to online MS account" orange dot notification in start menu
+- open gpedit.msc
+- go to `Computer Configuration\Windows Settings\Security Settings\Local Policies\Security Options`
+- Set `Accounts: Block Microsoft accounts` to `Users can't add or log on with Microsoft accounts`
+
 ### Disabling windows magnifier
 I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterprise OS build: 22000.675), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
 - run Command Prompt (Admin)
