@@ -12,6 +12,7 @@ Scoop is a windows command line package manager, for installation refer: https:/
 ### MinGit
 Git CSM automatically installs git bash and git GUI, which I don't need, instead I use Scoop package manager to install MinGit:  
 `scoop install mingit`  
+if you need git-lfs: `scoop install git-lfs`  
 now we can use the git command from command prompt and powershell.
 To be able to authenticate via the browser we can set git credential manager:  
 `git config --global credential.helper manager`  
