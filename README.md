@@ -19,10 +19,6 @@ To be able to authenticate via the browser we can set git credential manager:
 We can also share the credential manager with WSL by running the following command in WSL:  
 `git config --global credential.helper "/mnt/c/Users/MichaelWork/scoop/apps/mingit/current/mingw64/bin/git-credential-manager.exe"`  
 
-### WSL 2
-Windows subsystem for linux  
-Just google install instructions
-
 ### VSCode WSL extension
 This lets you run VS Code’s UI on Windows, and all your commands, extensions, and even the terminal, run on Linux.  
 - Install the WSL extension in VS code.  
