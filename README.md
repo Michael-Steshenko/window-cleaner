@@ -57,13 +57,8 @@ If you want this script to run on startup you need to:
 ## Configurations
 
 ### Setting up enviorment variables in WSL
-- Launch your wsl instance.
-- $ sudo vim ~/.bashrc
-- Enter your password.
-- Press i to go into edit mode. Go to the end of the file using arrow key.
+- $ sudo nvim ~/.bashrc
 - Add your variable as API_KEY=123 at the end of the file. If your variable has spaces, use quotes.Example - API_KEY= 'My Key'
-- Press esc key to get out of edit mode.
-- Enter :wq and press enter . This will save and close the file.
 - $ source ~/.bashrc will load your recent changes into your current shell.
 
 ### Better PowerShell autocomplete command history
