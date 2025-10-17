@@ -32,7 +32,6 @@ If you use mingit the command will look something like this:
 taken from [here](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md#configuring-wsl-with-git-for-windows-recommended)
 
 ### Windows Terminal
-A wrapper for all the CLI that you need in Windows.
 https://docs.microsoft.com/en-us/windows/terminal/get-started
 
 ### PowerToys
