@@ -3,9 +3,6 @@ A place for me to keep a set of tools, configurations and installation instructi
 
 ## Tools
 
-### Scoop
-Scoop is a windows command line package manager, for installation refer: https://scoop.sh
-
 ### WinGet
 Currently trying out switching from Scoop to WinGet
 
