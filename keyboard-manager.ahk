@@ -69,82 +69,75 @@ SortArrayNumeric(&arr) {
 
 ; Function to launch or cycle through app windows (stateless)
 LaunchOrCycle(apps) {
-    static busy := false
-    if (busy)
+    if (Type(apps) = "String")
+        apps := [apps]
+
+    ; Collect current, valid, activatable window IDs for all apps
+    allWindows := []
+    for app in apps {
+        exe := NormalizeExe(app)
+
+        ; Special case: wt.exe launches as WindowsTerminal.exe
+        ; We cannot use full path here because the exe is from MS store
+        ; and the parent folder includes the version,
+        ; so updating would break the hardcoded path
+        if (StrLower(exe) = "wt.exe")
+            exe := "WindowsTerminal.exe"
+
+        for hwnd in WinGetList("ahk_exe " exe) {
+            if (!WinExist("ahk_id " hwnd))
+                continue
+            if (IsCloaked(hwnd))
+                continue
+            if (WinGetTitle("ahk_id " hwnd) = "")
+                continue
+            allWindows.Push(hwnd)
+        }
+    }
+
+    ; If nothing is open, launch using the original path/name
+    if (allWindows.Length = 0) {
+        try {
+            Run apps[1]  ; Use Run with the full path as-is
+        } catch as err {
+            MsgBox "Failed to launch: " apps[1] "`n" err.Message
+        }
         return
-    busy := true
-    try {
-        if (Type(apps) = "String")
-            apps := [apps]
+    }
 
-        ; Collect current, valid, activatable window IDs for all apps
-        allWindows := []
-        for app in apps {
-            exe := NormalizeExe(app)
+    ; Stable order (not affected by activation/Z-order changes)
+    SortArrayNumeric(&allWindows)
+    activeID := WinGetID("A")
 
-            ; Special case: wt.exe launches as WindowsTerminal.exe
-            ; We cannot use full path here because the exe is from MS store
-            ; and the parent folder includes the version,
-            ; so updating would break the hardcoded path
-            if (StrLower(exe) = "wt.exe")
-                exe := "WindowsTerminal.exe"
-
-            for hwnd in WinGetList("ahk_exe " exe) {
-                if (!WinExist("ahk_id " hwnd))
-                    continue
-                if (IsCloaked(hwnd))
-                    continue
-                if (WinGetTitle("ahk_id " hwnd) = "")
-                    continue
-                allWindows.Push(hwnd)
-            }
-        }
-
-        ; If nothing is open, launch using the original path/name
-        if (allWindows.Length = 0) {
-            try {
-                Run apps[1]  ; Use Run with the full path as-is
-            } catch as err {
-                MsgBox "Failed to launch: " apps[1] "`n" err.Message
-            }
-            return
-        }
-
-        ; Stable order (not affected by activation/Z-order changes)
-        SortArrayNumeric(&allWindows)
-        activeID := WinGetID("A")
-
-        ; Single window: activate if needed
-        if (allWindows.Length = 1) {
-            target := allWindows[1]
-            if (activeID != target) {
-                if (WinGetMinMax("ahk_id " target) = -1)
-                    WinRestore "ahk_id " target
-                WinActivate "ahk_id " target
-            }
-            return
-        }
-
-        currentIndex := 0
-        Loop allWindows.Length {
-            if (allWindows[A_Index] = activeID) {
-                currentIndex := A_Index
-                break
-            }
-        }
-
-        ; Next index (wrap)
-        nextIndex := (currentIndex = 0) ? 1 : ((currentIndex < allWindows.Length) ? (currentIndex + 1) : 1)
-
-        target := allWindows[nextIndex]
-        if (WinGetMinMax("ahk_id " target) = -1)
-            WinRestore "ahk_id " target
+    ; Single window: activate if needed
+    if (allWindows.Length = 1) {
+        target := allWindows[1]
         if (activeID != target) {
+            if (WinGetMinMax("ahk_id " target) = -1)
+                WinRestore "ahk_id " target
             WinActivate "ahk_id " target
         }
-    } finally {
-        busy := false
+        return
     }
+
+    currentIndex := 0
+    Loop allWindows.Length {
+        if (allWindows[A_Index] = activeID) {
+            currentIndex := A_Index
+            break
+        }
+    }
+
+    ; Next index (wrap)
+    nextIndex := (currentIndex = 0) ? 1 : ((currentIndex < allWindows.Length) ? (currentIndex + 1) : 1)
+
+    target := allWindows[nextIndex]
+    if (WinGetMinMax("ahk_id " target) = -1)
+        WinRestore "ahk_id " target
+    if (activeID != target) {
+        WinActivate "ahk_id " target
+    }
+
 }
 
 ;Disable ctrl + alt + shift + win lauching office
