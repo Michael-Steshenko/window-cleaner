@@ -9,8 +9,8 @@ Scoop is a windows command line package manager, for installation refer: https:/
 ### WinGet
 Currently trying out switching from Scoop to WinGet
 
-### Neo Vim
-`use in WSL - more native`
+### Neovim
+We can symlink the config files from WSL Neovim to Windows Neovim, this seems to be a cleaner solution then invoking WSL neovim in Windows, but I haven't had the chance to use it much yet.
 
 ### MinGit
 Git CSM automatically installs git bash and git GUI, which I don't need, instead I use Scoop package manager to install MinGit:  
