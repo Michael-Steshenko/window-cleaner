@@ -174,7 +174,7 @@ WindowsTerminalProcessName := "wt"
 
 ; Hyper key combinations (Ctrl+Win+Alt+Shift+Key)
 ^#!+1:: LaunchOrCycle("1Password")
-^#!+2:: LaunchOrCycle(["Firefox", "MSEdge"])
+^#!+2:: LaunchOrCycle(["Chrome", "MSEdge"])
 ^#!+3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
 ^#!+4:: LaunchOrCycle(WindowsTerminalProcessName)
 ^#!+T:: LaunchOrCycle("C:\Users\Michael\AppData\Local\Discord\Discord.exe")
