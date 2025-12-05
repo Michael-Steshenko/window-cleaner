@@ -159,7 +159,8 @@ LaunchOrCycle(apps) {
     Return
 }
 
-VSCodePath := "C:\Users\Michael\AppData\Local\Programs\Microsoft VS Code\Code.exe"
+VSCodePath := EnvGet("LOCALAPPDATA") "\Programs\Microsoft VS Code\Code.exe"
+
 VisualStudioProcessName := "devenv"
 WindowsTerminalProcessName := "wt"
 
@@ -168,4 +169,4 @@ WindowsTerminalProcessName := "wt"
 ^#!+2:: LaunchOrCycle(["Chrome", "MSEdge"])
 ^#!+3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
 ^#!+4:: LaunchOrCycle(WindowsTerminalProcessName)
-^#!+T:: LaunchOrCycle("C:\Users\Michael\AppData\Local\Discord\Discord.exe")
+^#!+T:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
