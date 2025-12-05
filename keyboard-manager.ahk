@@ -1,8 +1,28 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 
+; Performance optimizations
+ListLines 0
+KeyHistory 0
+SendMode "Input"
+#WinActivateForce
+SetWinDelay -1
 
+; ============================================================================
+; Virtual Desktop Helper - uses public IVirtualDesktopManager API
+; ============================================================================
+global VDManager := ComObject("{AA509086-5CA9-4C25-8F95-589D3C07B48A}", "{A5CD92FF-29BE-454C-8D04-D82879FB3F1B}")
+global VDIsWindowOnCurrentDesktop := NumGet(NumGet(VDManager.Ptr, 0, "Ptr"), 3 * A_PtrSize, "Ptr")
+
+IsWindowOnCurrentDesktop(hwnd) {
+    result := 0
+    try DllCall(VDIsWindowOnCurrentDesktop, "Ptr", VDManager.Ptr, "Ptr", hwnd, "Int*", &result)
+    return result
+}
+
+; ============================================================================
 ; Global variables
+; ============================================================================
 global CapsLockPressed := false
 global CapsLockTime := 0
 
@@ -40,107 +60,78 @@ NormalizeExe(name) {
     return InStr(exe, ".exe") ? exe : exe ".exe"
 }
 
-; Ignore cloaked (invisible UWP/background) windows
-IsCloaked(hwnd) {
-    cloaked := 0
-    DllCall("dwmapi\DwmGetWindowAttribute", "ptr", hwnd, "int", 14, "int*", cloaked, "int", 4)
-    return cloaked
+; Check if window is a real app window (visible, has title, not IME)
+IsRealWindow(hwnd) {
+    title := WinGetTitle("ahk_id " hwnd)
+    if (title = "" || InStr(title, "Default IME") || InStr(title, "MSCTFIME"))
+        return false
+    return WinGetStyle("ahk_id " hwnd) & 0x10000000  ; WS_VISIBLE
 }
 
-; Numeric in-place sort for small arrays (stable order independent of Z-order)
-SortArrayNumeric(&arr) {
-    len := arr.Length
-    if (len < 2)
-        return
-    Loop len - 1 {
-        i := A_Index
-        minIdx := i
-        j := i + 1
-        while (j <= len) {
-            if (arr[j] < arr[minIdx])
-                minIdx := j
-            j++
-        }
-        if (minIdx != i) {
-            tmp := arr[i], arr[i] := arr[minIdx], arr[minIdx] := tmp
-        }
-    }
-}
-
-; Function to launch or cycle through app windows (stateless)
+; Function to launch or cycle through app windows
+; If app is on another virtual desktop, does nothing (prevents duplicate launch error)
 LaunchOrCycle(apps) {
     if (Type(apps) = "String")
         apps := [apps]
 
-    ; Collect current, valid, activatable window IDs for all apps
     allWindows := []
+    existsOnOtherVD := false
+
+    DetectHiddenWindows true
     for app in apps {
         exe := NormalizeExe(app)
-
-        ; Special case: wt.exe launches as WindowsTerminal.exe
-        ; We cannot use full path here because the exe is from MS store
-        ; and the parent folder includes the version,
-        ; so updating would break the hardcoded path
         if (StrLower(exe) = "wt.exe")
             exe := "WindowsTerminal.exe"
 
         for hwnd in WinGetList("ahk_exe " exe) {
-            if (!WinExist("ahk_id " hwnd))
-                continue
-            if (IsCloaked(hwnd))
-                continue
-            if (WinGetTitle("ahk_id " hwnd) = "")
-                continue
-            allWindows.Push(hwnd)
+            if (IsWindowOnCurrentDesktop(hwnd)) {
+                if (IsRealWindow(hwnd))
+                    allWindows.Push(hwnd)
+            } else {
+                existsOnOtherVD := true
+            }
         }
     }
+    DetectHiddenWindows false
 
-    ; If nothing is open, launch using the original path/name
+    ; App on another VD - show tooltip in center of active monitor
+    if (allWindows.Length = 0 && existsOnOtherVD) {
+        CoordMode("ToolTip", "Screen")
+        MonitorGetWorkArea(MonitorGetPrimary(), &left, &top, &right, &bottom)
+        ToolTip("App is on another desktop", left + (right - left) // 2 - 113, top + (bottom - top) // 2 + 22)
+        SetTimer(() => ToolTip(), -1000)
+        return
+    }
+
+    ; Nothing open - launch
     if (allWindows.Length = 0) {
-        try {
-            Run apps[1]  ; Use Run with the full path as-is
-        } catch as err {
-            MsgBox "Failed to launch: " apps[1] "`n" err.Message
-        }
+        try Run(apps[1])
         return
     }
 
-    ; Stable order (not affected by activation/Z-order changes)
-    SortArrayNumeric(&allWindows)
+    ; Find next window to activate
     activeID := WinGetID("A")
-
-    ; Single window: activate if needed
-    if (allWindows.Length = 1) {
-        target := allWindows[1]
-        if (activeID != target) {
-            if (WinGetMinMax("ahk_id " target) = -1)
-                WinRestore "ahk_id " target
-            WinActivate "ahk_id " target
-        }
-        return
-    }
-
-    currentIndex := 0
+    nextIndex := 1
     Loop allWindows.Length {
         if (allWindows[A_Index] = activeID) {
-            currentIndex := A_Index
+            nextIndex := Mod(A_Index, allWindows.Length) + 1
             break
         }
     }
 
-    ; Next index (wrap)
-    nextIndex := (currentIndex = 0) ? 1 : ((currentIndex < allWindows.Length) ? (currentIndex + 1) : 1)
-
     target := allWindows[nextIndex]
-    if (WinGetMinMax("ahk_id " target) = -1)
-        WinRestore "ahk_id " target
-    if (activeID != target) {
-        WinActivate "ahk_id " target
+    try {
+        if (WinGetMinMax("ahk_id " target) = -1)
+            WinRestore("ahk_id " target)
+        WinActivate("ahk_id " target)
     }
-
 }
 
-;Disable ctrl + alt + shift + win lauching office
+; ============================================================================
+; Hotkey Definitions
+; ============================================================================
+
+; Disable ctrl + alt + shift + win launching office
 ; We need check every order of the last key, because these are all modifier keys
 +!^LWin::
 #^!Shift::
