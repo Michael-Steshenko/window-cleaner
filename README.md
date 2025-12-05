@@ -112,3 +112,7 @@ I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterp
 - Press CTRL + SHIFT + F to open the search window
 - Under file types add the following line to the end of the string: `!*\AppData\Local\Temp\TFSTemp\*`
 - Notice that the values in the string are semi-colon seperated.
+
+### TODO
+
+- When using hyper key to switch to an app that is open on another virtual desktop, it should switch to the virtual desktop that has the app open and switch to that app instead of trying to launch it again. In apps like discord this results in a failed to launch error.
