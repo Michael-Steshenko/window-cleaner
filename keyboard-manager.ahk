@@ -83,7 +83,12 @@ LaunchOrCycle(apps) {
         if (StrLower(exe) = "wt.exe")
             exe := "WindowsTerminal.exe"
 
-        for hwnd in WinGetList("ahk_exe " exe) {
+        ; Explorer.exe is always running as shell, so match by window class instead
+        winList := (StrLower(exe) = "explorer.exe")
+            ? WinGetList("ahk_class CabinetWClass")
+            : WinGetList("ahk_exe " exe)
+
+        for hwnd in winList {
             if (IsWindowOnCurrentDesktop(hwnd)) {
                 if (IsRealWindow(hwnd))
                     allWindows.Push(hwnd)
@@ -170,3 +175,4 @@ WindowsTerminalProcessName := "wt"
 ^#!+3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
 ^#!+4:: LaunchOrCycle(WindowsTerminalProcessName)
 ^#!+T:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
+^#!+E:: LaunchOrCycle("explorer.exe")
