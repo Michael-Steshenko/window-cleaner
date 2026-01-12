@@ -92,7 +92,16 @@ LaunchOrCycle(apps) {
             ToolTip("App is on another desktop", left + (right - left) // 2 - 113, top + (bottom - top) // 2 + 22)
             SetTimer(() => ToolTip(), -1000)
         } else {
-            try Run(apps[1])
+            try {
+                Run(apps[1])
+                ; Wait for window to appear and focus it
+                for exe in exeSet {
+                    if WinWait("ahk_exe " exe, , 3) {
+                        WinActivate("ahk_exe " exe)
+                        break
+                    }
+                }
+            }
         }
         return
     }
