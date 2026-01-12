@@ -74,26 +74,38 @@ LaunchOrCycle(apps) {
     if (Type(apps) = "String")
         apps := [apps]
 
+    ; Build a set of target exe names
+    exeSet := Map()
+    for app in apps {
+        exe := StrLower(NormalizeExe(app))
+        if (exe = "wt.exe")
+            exe := "windowsterminal.exe"
+        exeSet[exe] := true
+    }
+
     allWindows := []
     existsOnOtherVD := false
 
+    ; Get ALL windows in Z-order, then filter to our apps
     DetectHiddenWindows true
-    for app in apps {
-        exe := NormalizeExe(app)
-        if (StrLower(exe) = "wt.exe")
-            exe := "WindowsTerminal.exe"
+    for hwnd in WinGetList() {
+        try {
+            winExe := StrLower(WinGetProcessName("ahk_id " hwnd))
+            winClass := WinGetClass("ahk_id " hwnd)
 
-        ; Explorer.exe is always running as shell, so match by window class instead
-        winList := (StrLower(exe) = "explorer.exe")
-            ? WinGetList("ahk_class CabinetWClass")
-            : WinGetList("ahk_exe " exe)
+            ; Check if this window belongs to one of our target apps
+            isMatch := exeSet.Has(winExe)
+            ; Special case for explorer - match by class
+            if (exeSet.Has("explorer.exe") && winClass = "CabinetWClass")
+                isMatch := true
 
-        for hwnd in winList {
-            if (IsWindowOnCurrentDesktop(hwnd)) {
-                if (IsRealWindow(hwnd))
-                    allWindows.Push(hwnd)
-            } else {
-                existsOnOtherVD := true
+            if (isMatch) {
+                if (IsWindowOnCurrentDesktop(hwnd)) {
+                    if (IsRealWindow(hwnd))
+                        allWindows.Push(hwnd)
+                } else {
+                    existsOnOtherVD := true
+                }
             }
         }
     }
@@ -114,17 +126,10 @@ LaunchOrCycle(apps) {
         return
     }
 
-    ; Find next window to activate
-    activeID := WinGetID("A")
-    nextIndex := 1
-    Loop allWindows.Length {
-        if (allWindows[A_Index] = activeID) {
-            nextIndex := Mod(A_Index, allWindows.Length) + 1
-            break
-        }
-    }
+    ; Activate the bottom-most window in Z-order (least recently focused)
+    ; This cycles through all windows in round-robin fashion
+    target := allWindows[allWindows.Length]
 
-    target := allWindows[nextIndex]
     try {
         if (WinGetMinMax("ahk_id " target) = -1)
             WinRestore("ahk_id " target)
