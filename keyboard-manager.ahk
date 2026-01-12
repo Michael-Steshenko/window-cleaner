@@ -178,3 +178,6 @@ WindowsTerminalProcessName := "wt"
 ^#!+E:: LaunchOrCycle("explorer.exe")
 ^#!+M:: LaunchOrCycle("Thunderbird")
 ^#!+V:: LaunchOrCycle("vmware.exe")
+
+; Quit focused window (Alt+F4 alternative)
+^#!+Q:: WinClose("A")
