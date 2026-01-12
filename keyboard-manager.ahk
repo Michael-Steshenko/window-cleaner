@@ -176,3 +176,4 @@ WindowsTerminalProcessName := "wt"
 ^#!+4:: LaunchOrCycle(WindowsTerminalProcessName)
 ^#!+T:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
 ^#!+E:: LaunchOrCycle("explorer.exe")
+^#!+M:: LaunchOrCycle("Thunderbird")
