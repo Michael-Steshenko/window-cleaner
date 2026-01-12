@@ -106,8 +106,22 @@ LaunchOrCycle(apps) {
         return
     }
 
-    ; Activate bottom-most window (least recently focused) for round-robin cycling
-    target := allWindows[allWindows.Length]
+    ; Check if active window is one of our target apps
+    activeHwnd := WinGetID("A")
+    activeIsTarget := false
+    for hwnd in allWindows {
+        if (hwnd = activeHwnd) {
+            activeIsTarget := true
+            break
+        }
+    }
+
+    ; If active window is a target app, cycle to next; otherwise activate the most recent one
+    if (activeIsTarget)
+        target := allWindows[allWindows.Length]  ; Bottom of Z-order (least recent)
+    else
+        target := allWindows[1]  ; Top of Z-order (most recent)
+
     if (WinGetMinMax("ahk_id " target) = -1)
         WinRestore("ahk_id " target)
     WinActivate("ahk_id " target)
