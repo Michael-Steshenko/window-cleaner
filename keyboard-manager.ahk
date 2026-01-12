@@ -69,72 +69,55 @@ IsRealWindow(hwnd) {
 }
 
 ; Function to launch or cycle through app windows
-; If app is on another virtual desktop, does nothing (prevents duplicate launch error)
 LaunchOrCycle(apps) {
-    if (Type(apps) = "String")
-        apps := [apps]
+    apps := (Type(apps) = "String") ? [apps] : apps
 
-    ; Build a set of target exe names
+    ; Build a set of target exe names (with special cases)
     exeSet := Map()
     for app in apps {
         exe := StrLower(NormalizeExe(app))
-        if (exe = "wt.exe")
-            exe := "windowsterminal.exe"
-        exeSet[exe] := true
+        exeSet[(exe = "wt.exe") ? "windowsterminal.exe" : exe] := true
     }
 
     allWindows := []
     existsOnOtherVD := false
+    hasExplorer := exeSet.Has("explorer.exe")
 
-    ; Get ALL windows in Z-order, then filter to our apps
+    ; Get all windows in Z-order, filter to our target apps
     DetectHiddenWindows true
     for hwnd in WinGetList() {
         try {
             winExe := StrLower(WinGetProcessName("ahk_id " hwnd))
-            winClass := WinGetClass("ahk_id " hwnd)
-
-            ; Check if this window belongs to one of our target apps
-            isMatch := exeSet.Has(winExe)
-            ; Special case for explorer - match by class
-            if (exeSet.Has("explorer.exe") && winClass = "CabinetWClass")
-                isMatch := true
+            isMatch := exeSet.Has(winExe) || (hasExplorer && WinGetClass("ahk_id " hwnd) = "CabinetWClass")
 
             if (isMatch) {
-                if (IsWindowOnCurrentDesktop(hwnd)) {
-                    if (IsRealWindow(hwnd))
-                        allWindows.Push(hwnd)
-                } else {
+                if (!IsWindowOnCurrentDesktop(hwnd))
                     existsOnOtherVD := true
-                }
+                else if (IsRealWindow(hwnd))
+                    allWindows.Push(hwnd)
             }
         }
     }
     DetectHiddenWindows false
 
-    ; App on another VD - show tooltip in center of active monitor
-    if (allWindows.Length = 0 && existsOnOtherVD) {
-        CoordMode("ToolTip", "Screen")
-        MonitorGetWorkArea(MonitorGetPrimary(), &left, &top, &right, &bottom)
-        ToolTip("App is on another desktop", left + (right - left) // 2 - 113, top + (bottom - top) // 2 + 22)
-        SetTimer(() => ToolTip(), -1000)
-        return
-    }
-
-    ; Nothing open - launch
+    ; No windows on current VD
     if (allWindows.Length = 0) {
-        try Run(apps[1])
+        if (existsOnOtherVD) {
+            CoordMode("ToolTip", "Screen")
+            MonitorGetWorkArea(MonitorGetPrimary(), &left, &top, &right, &bottom)
+            ToolTip("App is on another desktop", left + (right - left) // 2 - 113, top + (bottom - top) // 2 + 22)
+            SetTimer(() => ToolTip(), -1000)
+        } else {
+            try Run(apps[1])
+        }
         return
     }
 
-    ; Activate the bottom-most window in Z-order (least recently focused)
-    ; This cycles through all windows in round-robin fashion
+    ; Activate bottom-most window (least recently focused) for round-robin cycling
     target := allWindows[allWindows.Length]
-
-    try {
-        if (WinGetMinMax("ahk_id " target) = -1)
-            WinRestore("ahk_id " target)
-        WinActivate("ahk_id " target)
-    }
+    if (WinGetMinMax("ahk_id " target) = -1)
+        WinRestore("ahk_id " target)
+    WinActivate("ahk_id " target)
 }
 
 ; ============================================================================
