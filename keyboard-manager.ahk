@@ -21,37 +21,21 @@ IsWindowOnCurrentDesktop(hwnd) {
 }
 
 ; ============================================================================
-; Global variables
+; F18 as Hyper Key (CapsLock remapped to F18 via PowerToys/Registry)
 ; ============================================================================
-global CapsLockPressed := false
-global CapsLockTime := 0
+global F18Time := 0
+global F18UsedAsModifier := false
 
-; Disable default CapsLock behavior
-SetCapsLockState "AlwaysOff"
-
-; CapsLock down - act as Hyper (Ctrl+Win+Alt+Shift)
-*CapsLock:: {
-    global CapsLockPressed, CapsLockTime
-    if (!CapsLockPressed) {
-        CapsLockPressed := true
-        CapsLockTime := A_TickCount
-        ; Send down all Hyper modifiers
-        Send "{Ctrl down}{LWin down}{Alt down}{Shift down}"
-    }
+*F18:: {
+    global F18Time, F18UsedAsModifier
+    F18Time := A_TickCount
+    F18UsedAsModifier := false
 }
 
-; CapsLock up - release Hyper or send Escape if tapped
-*CapsLock Up:: {
-    global CapsLockPressed, CapsLockTime
-    duration := A_TickCount - CapsLockTime
-
-    ; Release all Hyper modifiers
-    Send "{Shift up}{Alt up}{LWin up}{Ctrl up}"
-
-    if (CapsLockPressed && duration < 400) {
+*F18 Up:: {
+    global F18Time, F18UsedAsModifier
+    if (!F18UsedAsModifier && A_TickCount - F18Time < 400)
         Send "{Escape}"
-    }
-    CapsLockPressed := false
 }
 
 ; Normalize to *.exe for process matching/launching
@@ -135,11 +119,9 @@ LaunchOrCycle(apps) {
 }
 
 ; Disable all microsoft app shortcuts
-; note that we are not allowed to define the same hotkey twice,
-; so comment out hotkeys here if you want to map them to something else
 ^#!+::     ; Office
 ^#!+W::    ; Word
-;^#!+T::   ; Teams
+;^#!+T::    ; Teams
 ^#!+Y::    ; Yammer
 ^#!+O::    ; Outlook
 ^#!+P::    ; PowerPoint
@@ -148,24 +130,20 @@ LaunchOrCycle(apps) {
 ^#!+N::    ; OneNote
 ^#!+D::    ; OneDrive
 {
-    Send "{Blind}{vkE8}" ; do nothing
     Return
 }
 
 VSCodePath := EnvGet("LOCALAPPDATA") "\Programs\Microsoft VS Code\Code.exe"
-
 VisualStudioProcessName := "devenv"
 WindowsTerminalProcessName := "wt"
 
-; Hyper key combinations (Ctrl+Win+Alt+Shift+Key)
-^#!+1:: LaunchOrCycle("1Password")
-^#!+2:: LaunchOrCycle(["Chrome", "MSEdge"])
-^#!+3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
-^#!+4:: LaunchOrCycle(WindowsTerminalProcessName)
-^#!+T:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
-^#!+E:: LaunchOrCycle("explorer.exe")
-^#!+M:: LaunchOrCycle("Thunderbird")
-^#!+V:: LaunchOrCycle("vmware.exe")
-
-; Quit focused window (Alt+F4 alternative)
-^#!+Q:: WinClose("A")
+; Hyper Key combinations
+F18 & 1:: LaunchOrCycle("1Password")
+F18 & 2:: LaunchOrCycle(["Chrome", "MSEdge"])
+F18 & 3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
+F18 & 4:: LaunchOrCycle(WindowsTerminalProcessName)
+F18 & t:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
+F18 & e:: LaunchOrCycle("explorer.exe")
+F18 & m:: LaunchOrCycle("Thunderbird")
+F18 & v:: LaunchOrCycle("vmware.exe")
+F18 & q:: WinClose("A")

@@ -75,6 +75,8 @@ If you want this script to run on startup you need to:
 - place `_VD.ahk` in some other folder for example `C:\Users\<my user>\Documents`
 - change import path inside `move_to_diff_VD.ahk` to be `C:\Users\<my user>\Documents\_VD.ahk`
 
+> **Note:** `keyboard-manager.ahk` relies on PowerToys remapping CapsLock to F18.
+
 ## Configurations
 
 ### Setting up enviorment variables in WSL
