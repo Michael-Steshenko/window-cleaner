@@ -86,7 +86,7 @@ If you want this script to run on startup you need to:
 - $ source ~/.bashrc will load your recent changes into your current shell.
 
 ### Powershell 7
-`winget install Micorosoft.Powershell`
+`winget install Microsoft.Powershell`
 
 #### Better PowerShell autocomplete command history
 
