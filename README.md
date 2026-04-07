@@ -21,7 +21,8 @@ Recommended, set up things in arch in the following order:
 
 ### Neovim
 
-We can symlink the config files from WSL Neovim to Windows Neovim, this seems to be a cleaner solution then invoking WSL neovim in Windows, but I haven't had the chance to use it much yet.
+We can symlink the config files from WSL Neovim to Windows Neovim, this seems to be a cleaner solution then invoking WSL neovim in Windows, but I haven't had the chance to use it much yet.  
+Alternatively: `winget install Neovim.Neovim`
 
 #### VSCode Neovim extension
 
