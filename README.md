@@ -52,6 +52,17 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
 
 `winget install Microsoft.WindowsTerminal`
 
+### Powershell 7
+`winget install Microsoft.Powershell`
+
+#### Better PowerShell autocomplete command history
+
+Tested with PS7, this configuration is for [all powershell users for all hosts](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.4#profile-types-and-locations)
+
+- `nvim $PSHOME\Profile.ps1`
+- add this line: `Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView`
+- restart powershell
+
 ### PowerToys
 
 Microsoft PowerToys is a set of utilities for power users to tune and streamline their Windows 10 experience for greater productivity.  
@@ -85,17 +96,6 @@ If you want this script to run on startup you need to:
 - $ sudo nvim ~/.bashrc
 - Add your variable as API_KEY=123 at the end of the file. If your variable has spaces, use quotes.Example - API_KEY= 'My Key'
 - $ source ~/.bashrc will load your recent changes into your current shell.
-
-### Powershell 7
-`winget install Microsoft.Powershell`
-
-#### Better PowerShell autocomplete command history
-
-Tested with PS7, this configuration is for [all powershell users for all hosts](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.4#profile-types-and-locations)
-
-- `nvim $PSHOME\Profile.ps1`
-- add this line: `Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView`
-- restart powershell
 
 ### Disable Microsoft "log in to online MS account" orange dot notification in start menu
 
