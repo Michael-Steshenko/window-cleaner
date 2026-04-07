@@ -85,7 +85,10 @@ If you want this script to run on startup you need to:
 - Add your variable as API_KEY=123 at the end of the file. If your variable has spaces, use quotes.Example - API_KEY= 'My Key'
 - $ source ~/.bashrc will load your recent changes into your current shell.
 
-### Better PowerShell autocomplete command history
+### Powershell 7
+`winget install Micorosoft.Powershell`
+
+#### Better PowerShell autocomplete command history
 
 Tested with PS7, this configuration is for [all powershell users for all hosts](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.4#profile-types-and-locations)
 
