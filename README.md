@@ -49,7 +49,7 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
 
 ### Windows Terminal
 
-https://docs.microsoft.com/en-us/windows/terminal/get-started
+`winget install Microsoft.WindowsTerminal`
 
 ### PowerToys
 
