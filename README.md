@@ -89,6 +89,15 @@ If you want this script to run on startup you need to:
 
 > **Note:** `keyboard-manager.ahk` relies on PowerToys remapping CapsLock to F18.
 
+### Visual Studio
+`winget install Microsoft.VisualStudio.Community`
+
+#### Disable searching in the temp folder of Visual Stuido
+
+- Press CTRL + SHIFT + F to open the search window
+- Under file types add the following line to the end of the string: `!*\AppData\Local\Temp\TFSTemp\*`
+- Notice that the values in the string are semi-colon seperated.
+
 ## Configurations
 
 ### Setting up enviorment variables in WSL
@@ -105,18 +114,13 @@ If you want this script to run on startup you need to:
 
 ### Disable windows magnifier
 
-I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterprise OS build: 22000.675), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
+I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterprise OS build: 2200winget install Microsoft.VisualStudio.Community
+0.675), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
 
 - run Command Prompt (Admin)
 - Run the following commands to change the ownership of the Magnify.exe app and grant full permissions to Administrators and rename it. Without these steps you’re unable to rename or make any change to the Magnify.exe file.
 - `takeown /f C:\Windows\System32\Magnify.exe`
 - `cacls C:\Windows\System32\Magnify.exe /G administrators:F`
 - `mv C:\Windows\System32\Magnify.exe C:\Windows\System32\Magnify.exe.bak`
-
-### Disable searching in the temp folder of Visual Stuido
-
-- Press CTRL + SHIFT + F to open the search window
-- Under file types add the following line to the end of the string: `!*\AppData\Local\Temp\TFSTemp\*`
-- Notice that the values in the string are semi-colon seperated.
 
 ### TODO
