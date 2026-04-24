@@ -90,7 +90,7 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
 `winget install Microsoft.Powertoys`  
 Microsoft PowerToys is a set of utilities for power users to tune and streamline their Windows 10 experience for greater productivity.  
 I use this for remapping keyboard shortcuts that windows does not let me remap or disable and for FancyZones - a windows window layout manager.  
-The [config](./settings.ptb) file is in the repository.
+The [config](./settings_134126987218497327.ptb) file is in the repository.
 
 ### AutoHotKey
 
