@@ -94,6 +94,7 @@ The [config](./settings_134126987218497327.ptb) file is in the repository.
 
 ### AutoHotKey
 
+`winget install AutoHotkey.AutoHotkey`  
 Automation scripting language for Windows. https://www.autohotkey.com  
 I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page to quickly switch between bluetooth audio output devices.  
 See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview, need to update behavior for non preview builds)  
