@@ -22,18 +22,32 @@ Recommended, set up things in arch in the following order:
 - Install sudo: `pacman -S sudo`
 - Install nvim: `pacman -S extra/neovim`
 - create a non-root user with a password and set it as default user:
-```
-# Create the user with a home directory (-m), bash shell (-s), and add to the wheel group (-G)
-useradd -m -G wheel -s /bin/bash michael
-
-# Set the password for the new user
-passwd michael
-```
+   - Create the default user:
+   ```
+   # Create the user with a home directory (-m), bash shell (-s), and add to the wheel group (-G)
+   useradd -m -G wheel -s /bin/bash michael
+   
+   # Set the password for the new user
+   passwd michael
+   ```
+   - Add this to your `~/.bashrc`:
+   ```
+   # set default editor
+   export EDITOR=nvim
+   export VISUAL=nvim
+   ```
+   - Run `visudo` and uncomment: `%wheel ALL=(ALL:ALL) ALL`
+   - `nvim /etc/wsl.conf` and add the following:
+   ```
+   [user]
+   default=michael
+   ```
+   - in `PS` run `wsl --shutdown`
 
 ### Neovim
 
 We can symlink the config files from WSL Neovim to Windows Neovim, this seems to be a cleaner solution then invoking WSL neovim in Windows, but I haven't had the chance to use it much yet.  
-Alternatively: `winget install Neovim.Neovim`
+To install: `winget install Neovim.Neovim`
 
 #### VSCode Neovim extension
 
