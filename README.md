@@ -21,7 +21,14 @@ Recommended, set up things in arch in the following order:
 
 - Install sudo: `pacman -S sudo`
 - Install nvim: `pacman -S extra/neovim`
-- create a non-root user with a password and set it as default user
+- create a non-root user with a password and set it as default user:
+```
+# Create the user with a home directory (-m), bash shell (-s), and add to the wheel group (-G)
+useradd -m -G wheel -s /bin/bash michael
+
+# Set the password for the new user
+passwd michael
+```
 
 ### Neovim
 
