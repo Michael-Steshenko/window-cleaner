@@ -124,9 +124,8 @@ If you want this script to run on startup you need to:
 
 ### Setting up enviorment variables in WSL
 
-- $ sudo nvim ~/.bashrc
-- Add your variable as API_KEY=123 at the end of the file. If your variable has spaces, use quotes.Example - API_KEY= 'My Key'
-- $ source ~/.bashrc will load your recent changes into your current shell.
+- `sudo nvim ~/.bashrc`
+- Add your variable as `API_KEY=123` at the end of the file. If your variable has spaces, use quotes.Example - `API_KEY= 'My Key'`
 
 ### Disable Microsoft "log in to online MS account" orange dot notification in start menu
 
