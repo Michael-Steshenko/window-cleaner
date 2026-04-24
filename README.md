@@ -19,8 +19,8 @@ Ubuntu is annoying and has old packages.
 
 Recommended, set up things in arch in the following order:
 
-- Install sudo
-- Install nvim
+- Install sudo: `pacman -S sudo`
+- Install nvim: `pacman -S extra/neovim`
 - create a non-root user with a password and set it as default user
 
 ### Neovim
