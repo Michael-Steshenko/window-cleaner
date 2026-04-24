@@ -81,9 +81,7 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
 
 #### Better PowerShell autocomplete command history
 
-Tested with PS7, this configuration is for [all powershell users for all hosts](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.4#profile-types-and-locations)
-
-- `nvim $PSHOME\Profile.ps1`
+- `nvim $PROFILE`
 - add this line: `Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView`
 - restart powershell
 
