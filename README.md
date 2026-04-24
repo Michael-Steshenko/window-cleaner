@@ -8,6 +8,10 @@ Configurations and installation instructions for tools that I use for developmen
 
 Using as my default package manager
 
+On a system with no Microsoft store:
+- Install MS Store via `ms reset -i`, app installer should be available in a few minutes.
+- Install `App Installer` from MS Store from `ms-windows-store://pdp/?productId=9nblggh4nns1`, this is needed to run `msixbundle` packages and also includes the `Winget` package manager.
+
 ### WSL
 
 Install Arch btw.  
