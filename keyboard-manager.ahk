@@ -32,6 +32,10 @@ global F18Time := 0
 
 *F18 Up:: {
     global F18Time, F18UsedAsModifier
+    ; Release LWin if it was held down by a window management shortcut
+    if GetKeyState("LWin")
+        Send "{LWin Up}"
+
     if (A_TickCount - F18Time < 400)
         Send "{Escape}"
 }
@@ -168,3 +172,25 @@ F18 & e:: LaunchOrCycle("explorer.exe")
 F18 & m:: LaunchOrCycle("Thunderbird")
 F18 & v:: LaunchOrCycle("vmware.exe")
 F18 & q:: WinClose("A")
+
+; Window Management - map Win + arrow keys to Hyper + h/j/k/l
+F18 & h:: {
+    if !GetKeyState("LWin")
+        Send "{LWin Down}"
+    Send "{Left}"
+}
+F18 & j:: {
+    if !GetKeyState("LWin")
+        Send "{LWin Down}"
+    Send "{Down}"
+}
+F18 & k:: {
+    if !GetKeyState("LWin")
+        Send "{LWin Down}"
+    Send "{Up}"
+}
+F18 & l:: {
+    if !GetKeyState("LWin")
+        Send "{LWin Down}"
+    Send "{Right}"
+}
