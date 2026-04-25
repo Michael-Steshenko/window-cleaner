@@ -24,17 +24,15 @@ IsWindowOnCurrentDesktop(hwnd) {
 ; F18 as Hyper Key (CapsLock remapped to F18 via PowerToys/Registry)
 ; ============================================================================
 global F18Time := 0
-global F18UsedAsModifier := false
 
 *F18:: {
     global F18Time, F18UsedAsModifier
     F18Time := A_TickCount
-    F18UsedAsModifier := false
 }
 
 *F18 Up:: {
     global F18Time, F18UsedAsModifier
-    if (!F18UsedAsModifier && A_TickCount - F18Time < 400)
+    if (A_TickCount - F18Time < 400)
         Send "{Escape}"
 }
 
