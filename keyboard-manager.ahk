@@ -35,7 +35,7 @@ global F18Down := false
 *F18 Up:: {
     global F18Time, F18Down
     F18Down := false
-    
+
     ; Release LWin if it was held down by a window management shortcut
     if GetKeyState("LWin")
         Send "{Blind}{LWin Up}"
@@ -180,7 +180,7 @@ WindowsTerminalProcessName := "wt"
 *v:: LaunchOrCycle("vmware.exe")
 *q:: WinClose("A")
 
-; Window Management (Win + Arrows)
+; Window Management, Hyper + h/j/k/l maps to Win + arrow keys
 *h:: {
     if !GetKeyState("LWin")
         Send "{Blind}{LWin Down}"
