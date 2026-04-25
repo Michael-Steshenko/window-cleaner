@@ -9,6 +9,7 @@ Configurations and installation instructions for tools that I use for developmen
 Using as my default package manager
 
 On a system with no Microsoft store:
+
 - Install MS Store via `ms reset -i`, app installer should be available in a few minutes.
 - Install `App Installer` from MS Store from `ms-windows-store://pdp/?productId=9nblggh4nns1`, this is needed to run `msixbundle` packages and also includes the `Winget` package manager.
 
@@ -21,27 +22,33 @@ Recommended, set up things in arch in the following order:
 
 - Install sudo and neovim: `pacman -Syu sudo neovim`
 - create a non-root user with a password and set it as default user:
-   - Create the default user:
-   ```
-   # Create the user with a home directory (-m), bash shell (-s), and add to the wheel group (-G)
-   useradd -m -G wheel -s /bin/bash michael
-   
-   # Set the password for the new user
-   passwd michael
-   ```
-   - Add this to your `~/.bashrc`:
-   ```
-   # set default editor
-   export EDITOR=nvim
-   export VISUAL=nvim
-   ```
-   - Run `visudo` and uncomment: `%wheel ALL=(ALL:ALL) ALL`
-   - `nvim /etc/wsl.conf` and add the following:
-   ```
-   [user]
-   default=michael
-   ```
-   - in `PS` run `wsl --shutdown`
+  - Create the default user:
+
+  ```
+  # Create the user with a home directory (-m), bash shell (-s), and add to the wheel group (-G)
+  useradd -m -G wheel -s /bin/bash michael
+
+  # Set the password for the new user
+  passwd michael
+  ```
+
+  - Add this to your `~/.bashrc`:
+
+  ```
+  # set default editor
+  export EDITOR=nvim
+  export VISUAL=nvim
+  ```
+
+  - Run `visudo` and uncomment: `%wheel ALL=(ALL:ALL) ALL`
+  - `nvim /etc/wsl.conf` and add the following:
+
+  ```
+  [user]
+  default=michael
+  ```
+
+  - in `PS` run `wsl --shutdown`
 
 ### Neovim
 
@@ -77,6 +84,7 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
 `winget install Microsoft.WindowsTerminal`
 
 ### Powershell 7
+
 `winget install Microsoft.Powershell`
 
 #### Better PowerShell autocomplete command history
@@ -96,24 +104,18 @@ The [config](./settings_134126987218497327.ptb) file is in the repository.
 
 `winget install AutoHotkey.AutoHotkey`  
 Automation scripting language for Windows. https://www.autohotkey.com  
-I use it to create custom windows keyboard shorcuts, for example, I use a shortcut to access the Bluetooth devices settings page to quickly switch between bluetooth audio output devices.  
-See Bluetooth-Devices.ahk in this repository. (Tested on Windows 11 Preview, need to update behavior for non preview builds)  
-To make AHK scrips or any other file launch on Windows startup for all users:
+I use it to create custom windows keyboard shorcuts.
+See `keyboard-manager.ahk` in this repository.
+
+To install the script to run on startup run the `install.cmd` script or manually:
 
 - Press Win+R to open the Run dialog and type `shell:common startup` this will open a folder from which programs are launched at startup
 - place the AHK script or shortcut to the AHK script in that folder
 
-`move_to_diff_VD.ahk` allows moving windows to adjecent virtual desktops via keyboard shortcuts, but it has to import `_VD.ahk`.  
-Importing a file that's located in `shell:common startup` doesn't work.  
-If you want this script to run on startup you need to:
-
-- place `move_to_diff_VD.ahk` in `shell:common startup` like described before.
-- place `_VD.ahk` in some other folder for example `C:\Users\<my user>\Documents`
-- change import path inside `move_to_diff_VD.ahk` to be `C:\Users\<my user>\Documents\_VD.ahk`
-
 > **Note:** `keyboard-manager.ahk` relies on PowerToys remapping CapsLock to F18.
 
 ### Visual Studio
+
 `winget install Microsoft.VisualStudio.Community`
 
 #### Disable searching in the temp folder of Visual Stuido
