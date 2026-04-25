@@ -24,19 +24,24 @@ IsWindowOnCurrentDesktop(hwnd) {
 ; F18 as Hyper Key (CapsLock remapped to F18 via PowerToys/Registry)
 ; ============================================================================
 global F18Time := 0
+global F18Down := false
 
 *F18:: {
-    global F18Time, F18UsedAsModifier
+    global F18Time, F18Down
     F18Time := A_TickCount
+    F18Down := true
 }
 
 *F18 Up:: {
-    global F18Time, F18UsedAsModifier
+    global F18Time, F18Down
+    F18Down := false
+    
     ; Release LWin if it was held down by a window management shortcut
     if GetKeyState("LWin")
-        Send "{LWin Up}"
+        Send "{Blind}{LWin Up}"
 
-    if (A_TickCount - F18Time < 400)
+    ; If no other hotkeys fired between Down and Up, it was a tap
+    if (A_PriorHotkey = "*F18" && A_TickCount - F18Time < 400)
         Send "{Escape}"
 }
 
@@ -162,35 +167,39 @@ VSCodePath := EnvGet("LOCALAPPDATA") "\Programs\Microsoft VS Code\Code.exe"
 VisualStudioProcessName := "devenv"
 WindowsTerminalProcessName := "wt"
 
-; Hyper Key combinations
-F18 & 1:: LaunchOrCycle("1Password")
-F18 & 2:: LaunchOrCycle(["Chrome", "MSEdge"])
-F18 & 3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
-F18 & 4:: LaunchOrCycle(WindowsTerminalProcessName)
-F18 & t:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
-F18 & e:: LaunchOrCycle("explorer.exe")
-F18 & m:: LaunchOrCycle("Thunderbird")
-F18 & v:: LaunchOrCycle("vmware.exe")
-F18 & q:: WinClose("A")
+#HotIf F18Down
 
-; Window Management - map Win + arrow keys to Hyper + h/j/k/l
-F18 & h:: {
+; Hyper Key combinations
+*1:: LaunchOrCycle("1Password")
+*2:: LaunchOrCycle(["Chrome", "MSEdge"])
+*3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
+*4:: LaunchOrCycle(WindowsTerminalProcessName)
+*t:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
+*e:: LaunchOrCycle("explorer.exe")
+*m:: LaunchOrCycle("Thunderbird")
+*v:: LaunchOrCycle("vmware.exe")
+*q:: WinClose("A")
+
+; Window Management (Win + Arrows)
+*h:: {
     if !GetKeyState("LWin")
-        Send "{LWin Down}"
-    Send "{Left}"
+        Send "{Blind}{LWin Down}"
+    Send "{Blind}{Left}"
 }
-F18 & j:: {
+*j:: {
     if !GetKeyState("LWin")
-        Send "{LWin Down}"
-    Send "{Down}"
+        Send "{Blind}{LWin Down}"
+    Send "{Blind}{Down}"
 }
-F18 & k:: {
+*k:: {
     if !GetKeyState("LWin")
-        Send "{LWin Down}"
-    Send "{Up}"
+        Send "{Blind}{LWin Down}"
+    Send "{Blind}{Up}"
 }
-F18 & l:: {
+*l:: {
     if !GetKeyState("LWin")
-        Send "{LWin Down}"
-    Send "{Right}"
+        Send "{Blind}{LWin Down}"
+    Send "{Blind}{Right}"
 }
+
+#HotIf
