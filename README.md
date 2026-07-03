@@ -59,7 +59,7 @@ To install: `winget install Neovim.Neovim`
 
 Use the WSL version of Neovim for this, Neovim seems to work better on Linux, see WSL section for installing WSL + WSL Neovim.
 
-#### VS vim extension
+#### VS VIM extension
 There is no embedded Neovim for VS, we use a VIM emulator instead.  
 - Install the `VSVim` extension from the `VS` `Extenstion Manager`
 - Sync VSVim and system clipboards:
