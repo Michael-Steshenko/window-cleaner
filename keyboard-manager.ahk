@@ -174,6 +174,7 @@ WindowsTerminalProcessName := "wt"
 *2:: LaunchOrCycle(["Chrome", "MSEdge"])
 *3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
 *4:: LaunchOrCycle(WindowsTerminalProcessName)
+*5:: LaunchOrCycle("obsidian.exe")
 *t:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
 *e:: LaunchOrCycle("explorer.exe")
 *m:: LaunchOrCycle("Thunderbird")
