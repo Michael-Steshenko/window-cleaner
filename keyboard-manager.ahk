@@ -1,6 +1,20 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 
+; Check if UI access is enabled in AutoHotkey, if not try enabling it
+; needed for capturing hyperkey input when an elevated app is focused.
+; Make sure the script is installed for "all users"
+; (winget install AutoHotkey.AutoHotkey --scope machine)
+if (!A_IsCompiled && !A_IsAdmin && !InStr(A_AhkPath, "_UIA")) {
+    try {
+        Run '*uiAccess "' A_ScriptFullPath '"'
+        ExitApp
+    } catch {
+        MsgBox("Warning: AutoHotkey is running without UI access, did you install AutoHotkey for all users (Program Files)?`n`nYour Hyper Key might not work in administrator windows unless you enable UI access or run the script as admin. ",
+            "UI access required", "Icon!")
+    }
+}
+
 ; Performance optimizations
 ListLines 0
 KeyHistory 0

@@ -60,12 +60,14 @@ To install: `winget install Neovim.Neovim`
 Use the WSL version of Neovim for this, Neovim seems to work better on Linux, see WSL section for installing WSL + WSL Neovim.
 
 #### VS VIM extension
-There is no embedded Neovim for VS, we use a VIM emulator instead.  
+
+There is no embedded Neovim for VS, we use a VIM emulator instead.
+
 - Install the `VSVim` extension from the `VS` `Extenstion Manager`
 - Sync VSVim and system clipboards:
-    - edit or create `C:\Users\Michael\_vsvimrc`
-    - add the following: `set clipboard=unnamed`
-    - restart VS
+  - edit or create `C:\Users\Michael\_vsvimrc`
+  - add the following: `set clipboard=unnamed`
+  - restart VS
 
 ### MinGit
 
@@ -110,15 +112,19 @@ The [config](./settings_134126987218497327.ptb) file is in the repository.
 
 ### AutoHotKey
 
-`winget install AutoHotkey.AutoHotkey`  
 Automation scripting language for Windows. https://www.autohotkey.com  
 I use it to create custom windows keyboard shorcuts.
 See `keyboard-manager.ahk` in this repository.
 
+We want out autohotkey script to be able to capture keyboard inputs even when an elevated window is in focus.
+There are 2 ways to achieve this, either run the autohotkey script as admin, or enable `UI access`, I prefer to enable `UI access`, this requires installing `AutoHotkey` for all users the install command below takes care of that, which allows the script to enable `UI access` for itself automatically:
+
+- `winget install AutoHotkey.AutoHotkey --scope machine`
+
 To install the script to run on startup run the `install.cmd` script or manually:
 
-- Press Win+R to open the Run dialog and type `shell:common startup` this will open a folder from which programs are launched at startup
-- place the AHK script or shortcut to the AHK script in that folder
+- Press Win+R to open the Run dialog and type `shell:common startup` this will open a folder from which programs are launched at startup.
+- Place the AHK script or shortcut to the AHK script in that folder.
 
 > **Note:** `keyboard-manager.ahk` relies on PowerToys remapping CapsLock to F18.
 
