@@ -1,0 +1,7 @@
+[Apps]
+; Windows Terminal
+terminal = wt
+
+; Windows Terminal Preview, can drop this when Window Terminal reaches version 1.25
+; 1.25 fixes an issue of shift + enter for new line not working with Antigravity CLI
+;Terminal=%LOCALAPPDATA%\Microsoft\WindowsApps\Microsoft.WindowsTerminalPreview_8wekyb3d8bbwe\wt.exe

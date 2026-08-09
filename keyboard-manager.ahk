@@ -73,6 +73,13 @@ IsRealWindow(hwnd) {
     return WinGetStyle("ahk_id " hwnd) & 0x10000000  ; WS_VISIBLE
 }
 
+; Expand environment variables in a string (e.g. %LOCALAPPDATA%)
+ExpandEnvVars(str) {
+    while RegExMatch(str, "%([^%]+)%", &match)
+        str := StrReplace(str, match[0], EnvGet(match[1]))
+    return str
+}
+
 ; Function to launch or cycle through app windows
 LaunchOrCycle(apps) {
     apps := (Type(apps) = "String") ? [apps] : apps
@@ -114,7 +121,7 @@ LaunchOrCycle(apps) {
             SetTimer(() => ToolTip(), -1000)
         } else {
             try {
-                Run(apps[1])
+                Run(ExpandEnvVars(apps[1]))
                 ; Wait for window to appear and focus it
                 for exe in exeSet {
                     if WinWait("ahk_exe " exe, , 3) {
@@ -177,9 +184,16 @@ LaunchOrCycle(apps) {
     Return
 }
 
+ConfigFile := A_ScriptDir "\config.ini"
+
+ReadAppConfig(key) {
+    global ConfigFile
+    return IniRead(ConfigFile, "Apps", key)
+}
+
 VSCodePath := EnvGet("LOCALAPPDATA") "\Programs\Microsoft VS Code\Code.exe"
 VisualStudioProcessName := "devenv"
-WindowsTerminalProcessName := "wt"
+WindowsTerminalProcessName := ReadAppConfig("Terminal")
 
 #HotIf F18Down
 
