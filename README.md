@@ -86,8 +86,8 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
 - Configure the WSL version of git, to use the windows version of git credential manager.  
    (this allows you to sign in through the browsers and remembers your credentials)  
    If you use mingit the command will look something like this:  
-   `git config --global credential.helper "/mnt/c/Users/Michael/scoop/apps/mingit/2.37.3.windows.1/mingw64/bin/git-credential-manager-core.exe"`  
-   taken from [here](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md#configuring-wsl-with-git-for-windows-recommended)
+   `git config --global credential.helper "/mnt/c/Users/Michael/AppData/Local/Microsoft/WinGet/Packages/Git.MinGit_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/git-credential-manager.exe"`  
+  taken from [here](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md#configuring-wsl-with-git-for-windows-recommended)
 
 ### Windows Terminal
 
