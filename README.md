@@ -141,7 +141,7 @@ To install the script to run on startup run the `install.cmd` script or manually
 ### CLI tools for AI agents
 My working theory is that AI agnets prefer Unix tools, and not all the tools are available on winget, so we use scoop.
 - install [scoop](https://scoop.sh/)
-- `scoop install uutils-coreutils sed gawk ripgrep`
+- `scoop install findutils uutils-coreutils sed gawk grep ripgrep`
 
 ## Configurations
 
