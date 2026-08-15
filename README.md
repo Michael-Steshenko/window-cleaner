@@ -71,7 +71,7 @@ There is no embedded Neovim for VS, we use a VIM emulator instead.
 
 ### MinGit
 
-Git CSM automatically installs git bash and git GUI, which I don't need, instead I use Scoop package manager to install MinGit:  
+Git CSM automatically installs git bash and git GUI, which I don't need, instead I use Winget to install MinGit:  
 `winget install Git.MinGit`  
 if you need git-lfs: `winget install GitHub.GitLFS`  
 now we can use the git command from command prompt and powershell.
@@ -137,6 +137,11 @@ To install the script to run on startup run the `install.cmd` script or manually
 - Press CTRL + SHIFT + F to open the search window
 - Under file types add the following line to the end of the string: `!*\AppData\Local\Temp\TFSTemp\*`
 - Notice that the values in the string are semi-colon seperated.
+
+### CLI tools for AI agents
+My working theory is that AI agnets prefer Unix tools, and not all the tools are available on winget, so we use scoop.
+- install [scoop](https://scoop.sh/)
+- `scoop install uutils-coreutils sed gawk ripgrep`
 
 ## Configurations
 
