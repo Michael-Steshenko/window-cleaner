@@ -1,6 +1,11 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 
+; -- Requirments --
+; 1. This script uses PowerToys FancyZones for window management,
+; we assume the layouts have no padding ("Space around zones" disabled)
+; for exact screen-edge boundary detection.
+
 ; Check if UI access is enabled in AutoHotkey, if not try enabling it
 ; needed for capturing hyperkey input when an elevated app is focused.
 ; Make sure the script is installed for "all users"
@@ -39,6 +44,7 @@ IsWindowOnCurrentDesktop(hwnd) {
 ; ============================================================================
 global F18Time := 0
 global F18Down := false
+global LastMinimizedHwnd := 0
 
 *F18:: {
     global F18Time, F18Down
@@ -47,8 +53,9 @@ global F18Down := false
 }
 
 *F18 Up:: {
-    global F18Time, F18Down
+    global F18Time, F18Down, LastMinimizedHwnd
     F18Down := false
+    LastMinimizedHwnd := 0
 
     ; Release LWin if it was held down by a window management shortcut
     if GetKeyState("LWin")
@@ -259,17 +266,99 @@ MoveZone(dir) {
     }
 }
 
+MoveDownOrMinimize() {
+    global LastMinimizedHwnd
+    ; Only allow one minimize per Hyper key press
+    if (LastMinimizedHwnd != 0)
+        return
+
+    try {
+        if !WinExist("A") || !IsRealWindow(WinGetID("A"))
+            return
+        hwnd := WinGetID("A")
+
+        ; If window is currently maximized, restore it back to its normal zone
+        if (WinGetMinMax("ahk_id " hwnd) = 1) {
+            WinRestore("ahk_id " hwnd)
+            return
+        }
+
+        vRect := GetWindowVisualRect(hwnd)
+        midX := (vRect.left + vRect.right) // 2
+        midY := (vRect.top + vRect.bottom) // 2
+        foundMonitor := false
+        Loop MonitorGetCount() {
+            MonitorGetWorkArea(A_Index, &mLeft, &mTop, &mRight, &mBottom)
+            if (midX >= mLeft && midX <= mRight && midY >= mTop && midY <= mBottom) {
+                foundMonitor := true
+                break
+            }
+        }
+
+        ; In multi-row layouts: if window is in an upper row, move it DOWN
+        if (foundMonitor && vRect.bottom < mBottom) {
+            if !GetKeyState("LWin")
+                Send "{Blind}{LWin Down}"
+            Send "{Blind}{Down}"
+            return
+        }
+
+        ; Otherwise, window is at bottom of the monitor (or single-row layout): MINIMIZE
+        if GetKeyState("LWin")
+            Send "{Blind}{LWin Up}"
+        LastMinimizedHwnd := hwnd
+        WinMinimize("ahk_id " hwnd)
+    }
+}
+
+MoveUpOrUnminimize() {
+    global LastMinimizedHwnd
+    ; Unminimizing only works during the same Hyper hold where a window was minimized
+    if (LastMinimizedHwnd != 0) {
+        if WinExist("ahk_id " LastMinimizedHwnd) && (WinGetMinMax("ahk_id " LastMinimizedHwnd) = -1) {
+            WinRestore("ahk_id " LastMinimizedHwnd)
+            WinActivate("ahk_id " LastMinimizedHwnd)
+            if GetKeyState("LWin")
+                Send "{Blind}{LWin Up}"
+            LastMinimizedHwnd := 0
+            return
+        }
+        LastMinimizedHwnd := 0
+    }
+
+    try {
+        if !WinExist("A") || !IsRealWindow(WinGetID("A"))
+            return
+        hwnd := WinGetID("A")
+        vRect := GetWindowVisualRect(hwnd)
+        midX := (vRect.left + vRect.right) // 2
+        midY := (vRect.top + vRect.bottom) // 2
+        foundMonitor := false
+        Loop MonitorGetCount() {
+            MonitorGetWorkArea(A_Index, &mLeft, &mTop, &mRight, &mBottom)
+            if (midX >= mLeft && midX <= mRight && midY >= mTop && midY <= mBottom) {
+                foundMonitor := true
+                break
+            }
+        }
+
+        ; In multi-row layouts: if window is in a lower row, move it UP
+        if (foundMonitor && vRect.top > mTop) {
+            if !GetKeyState("LWin")
+                Send "{Blind}{LWin Down}"
+            Send "{Blind}{Up}"
+            return
+        }
+
+        ; If at the top row and not maximized, maximize
+        if (WinGetMinMax("ahk_id " hwnd) = 0)
+            WinMaximize("ahk_id " hwnd)
+    }
+}
+
 *h:: MoveZone("Left")
-*j:: {
-    if !GetKeyState("LWin")
-        Send "{Blind}{LWin Down}"
-    Send "{Blind}{Down}"
-}
-*k:: {
-    if !GetKeyState("LWin")
-        Send "{Blind}{LWin Down}"
-    Send "{Blind}{Up}"
-}
+*j:: MoveDownOrMinimize()
+*k:: MoveUpOrUnminimize()
 *l:: MoveZone("Right")
 
 #HotIf
