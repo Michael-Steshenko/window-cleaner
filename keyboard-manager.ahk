@@ -212,11 +212,54 @@ WindowsTerminalProcessName := ReadAppConfig("Terminal")
 *q:: WinClose("A")
 
 ; Window Management, Hyper + h/j/k/l maps to Win + arrow keys
-*h:: {
-    if !GetKeyState("LWin")
-        Send "{Blind}{LWin Down}"
-    Send "{Blind}{Left}"
+; Get true visual bounds of window (excluding invisible DWM drop shadows)
+GetWindowVisualRect(hwnd) {
+    rect := Buffer(16, 0)
+    ; DWMWA_EXTENDED_FRAME_BOUNDS = 9
+    if (DllCall("dwmapi\DwmGetWindowAttribute", "Ptr", hwnd, "UInt", 9, "Ptr", rect, "UInt", 16) = 0) {
+        return {
+            left: NumGet(rect, 0, "Int"),
+            top: NumGet(rect, 4, "Int"),
+            right: NumGet(rect, 8, "Int"),
+            bottom: NumGet(rect, 12, "Int")
+        }
+    }
+    WinGetPos(&x, &y, &w, &h, hwnd)
+    return { left: x, top: y, right: x + w, bottom: y + h }
 }
+
+MoveZone(dir) {
+    try {
+        hwnd := WinGetID("A")
+        vRect := GetWindowVisualRect(hwnd)
+
+        midX := (vRect.left + vRect.right) // 2
+        midY := (vRect.top + vRect.bottom) // 2
+        foundMonitor := false
+        Loop MonitorGetCount() {
+            MonitorGetWorkArea(A_Index, &mLeft, &mTop, &mRight, &mBottom)
+            if (midX >= mLeft && midX <= mRight && midY >= mTop && midY <= mBottom) {
+                foundMonitor := true
+                break
+            }
+        }
+
+        ; Only block cycling if the window is visibly within a known monitor
+        ; If it is off-screen, allow the shortcut through so it can snap back
+        if foundMonitor {
+            if (dir = "Right" && vRect.right >= mRight)
+                return
+            if (dir = "Left" && vRect.left <= mLeft)
+                return
+        }
+
+        if !GetKeyState("LWin")
+            Send "{Blind}{LWin Down}"
+        Send "{Blind}{" dir "}"
+    }
+}
+
+*h:: MoveZone("Left")
 *j:: {
     if !GetKeyState("LWin")
         Send "{Blind}{LWin Down}"
@@ -227,10 +270,6 @@ WindowsTerminalProcessName := ReadAppConfig("Terminal")
         Send "{Blind}{LWin Down}"
     Send "{Blind}{Up}"
 }
-*l:: {
-    if !GetKeyState("LWin")
-        Send "{Blind}{LWin Down}"
-    Send "{Blind}{Right}"
-}
+*l:: MoveZone("Right")
 
 #HotIf
