@@ -161,7 +161,7 @@ My working theory is that AI agnets prefer Unix tools, and not all the tools are
 I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterprise OS build: 2200winget install Microsoft.VisualStudio.Community
 0.675), even when the shortcut was disabled in windows settings it would get re-enabled when the shorcut was pressed and would open magnifier, but we can disable magnifier itself:
 
-- run Command Prompt (Admin)
+- run PowerShell (Admin)
 - Run the following commands to change the ownership of the Magnify.exe app and grant full permissions to Administrators and rename it. Without these steps you’re unable to rename or make any change to the Magnify.exe file.
 - `takeown /f C:\Windows\System32\Magnify.exe`
 - `cacls C:\Windows\System32\Magnify.exe /G administrators:F`
