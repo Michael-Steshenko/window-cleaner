@@ -91,7 +91,7 @@ ExpandEnvVars(str) {
 LaunchOrCycle(apps) {
     apps := (Type(apps) = "String") ? [apps] : apps
 
-    ; Build a set of target exe names (with special cases)
+    ; Build a set of target exe names
     exeSet := Map()
     for app in apps {
         exe := StrLower(NormalizeExe(app))
@@ -198,9 +198,20 @@ ReadAppConfig(key) {
     return IniRead(ConfigFile, "Apps", key)
 }
 
+ReadAppList(key) {
+    raw := ReadAppConfig(key)
+    list := []
+    for item in StrSplit(raw, ",") {
+        trimmed := Trim(item)
+        if (trimmed != "")
+            list.Push(trimmed)
+    }
+    return list
+}
+
 VSCodePath := EnvGet("LOCALAPPDATA") "\Programs\Microsoft VS Code\Code.exe"
 VisualStudioProcessName := "devenv"
-WindowsTerminalProcessName := ReadAppConfig("Terminal")
+terminalApps := ReadAppList("Terminal")
 
 #HotIf F18Down
 
@@ -208,7 +219,7 @@ WindowsTerminalProcessName := ReadAppConfig("Terminal")
 *1:: LaunchOrCycle("1Password")
 *2:: LaunchOrCycle(["Chrome", "MSEdge"])
 *3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
-*4:: LaunchOrCycle(WindowsTerminalProcessName)
+*4:: LaunchOrCycle(terminalApps)
 *5:: LaunchOrCycle(EnvGet("LOCALAPPDATA") "\Programs\Obsidian\Obsidian.exe")
 ; For discord the path does not match the app name,
 ; we need to provide both the path to "Update.exe" and "Discord"
