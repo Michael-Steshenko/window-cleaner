@@ -100,7 +100,7 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
 - Install: `winget install wez.wezterm`
 - The configuration file [`.wezterm.lua`](./.wezterm.lua) is in this repository and symlinked to `~/.wezterm.lua` via `install.cmd`.
 - Key features configured:
-  - Unified title bar: tabs and Windows-style minimize/maximize/close buttons on a single top bar.
+  - Unified title bar: tabs and Windows-style minimize/maximize/close buttons on a single top bar. (as of 17Oct26 the buttons are non resizable so they don't exactly match the title bar)
   - Preconfigured profiles: PowerShell 7, Command Prompt, and Arch Linux (WSL).
   - `Ctrl + N` / `Ctrl + T`: Opens a new window or tab inheriting both the active environment (WSL / PWSH / CMD) and the current working directory.
   - Smart `Ctrl + C`: Copies when text is selected, sends interrupt (`^C`) when nothing is selected; `Ctrl + V` pastes.
@@ -108,6 +108,7 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
   - Fast tab closing: Window and tab close confirmation modals are disabled.
   - Custom Campbell palette and Cascadia font matching Windows Terminal.
   - Dynamic scroll position indicator: Thin (6px) scrollbar automatically shown only when offscreen scrollback exists (hidden on full-screen / no history).
+  - Custom tab names `PowerShell`, `CMD`, `Arch` and matching tab icons.
 
 ### Powershell 7
 
