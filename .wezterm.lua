@@ -11,6 +11,17 @@ config.window_decorations = 'INTEGRATED_BUTTONS | RESIZE'
 config.integrated_title_button_style = 'Windows'
 config.integrated_title_button_alignment = 'Right'
 config.show_tab_index_in_tab_bar = false
+config.use_fancy_tab_bar = true
+
+-- Windows 11 Fluent frame styling (Tabbed backdrop & opacity)
+config.win32_system_backdrop = 'Tabbed'
+config.window_background_opacity = 0.95
+
+-- font_size controls the overall height of the fancy title bar and tabs
+-- Titlebar background uses the default color so it matches the unselected tab background
+config.window_frame = {
+  font_size = 13.0,
+}
 
 -- Disable confirmation popups when closing window or tabs
 config.window_close_confirmation = 'NeverPrompt'
@@ -281,10 +292,32 @@ wezterm.on('update-status', function(window, pane)
   end)
 end)
 
--- Format tab title event (ensures profile name is always displayed with relaxed padding)
+-- Profile icons and brand colors (matching Windows Terminal)
+local function get_profile_icon_and_color(profile)
+  local lower = (profile or ''):lower()
+  if lower:find('pwsh') or lower:find('powershell') then
+    return (wezterm.nerdfonts.md_powershell or wezterm.nerdfonts.custom_powershell or '>_'), '#5391FE'
+  elseif lower:find('cmd') or lower:find('command') then
+    return (wezterm.nerdfonts.cod_terminal_cmd or wezterm.nerdfonts.cod_terminal or '>_'), '#C0C0C0'
+  elseif lower:find('arch') then
+    return (wezterm.nerdfonts.linux_archlinux or wezterm.nerdfonts.md_arch or wezterm.nerdfonts.fa_linux or 'A'), '#1793D1'
+  elseif lower:find('wsl') or lower:find('linux') or lower:find('bash') or lower:find('zsh') then
+    return (wezterm.nerdfonts.fa_linux or '$'), '#E95420'
+  end
+  return (wezterm.nerdfonts.cod_terminal or '>_'), '#FFFFFF'
+end
+
+-- Format tab title event: displays Windows Terminal profile icon + tab name in pure white
 wezterm.on('format-tab-title', function(tab, tabs, panes, cfg, hover, max_width)
   local profile = (tab.tab_title and #tab.tab_title > 0) and tab.tab_title or get_pane_profile(tab.active_pane)
-  return '     ' .. profile .. '     '
+  local icon, icon_color = get_profile_icon_and_color(profile)
+  return {
+    { Text = '   ' },
+    { Foreground = { Color = icon_color } },
+    { Text = icon },
+    { Foreground = { Color = '#FFFFFF' } },
+    { Text = '  ' .. profile .. '     ' },
+  }
 end)
 
 --------------------------------------------------------------------------------
