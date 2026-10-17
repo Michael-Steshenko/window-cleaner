@@ -167,7 +167,7 @@ Custom status line script [`agyStatusline.py`](./agyStatusline.py) (folder, bran
   ```json
   "statusLine": {
     "type": "command",
-    "command": "python -u C:/Users/Michael/.gemini/antigravity-cli/agyStatusline.py",
+    "command": "python -S -u C:/Users/Michael/.gemini/antigravity-cli/agyStatusline.py",
     "stack_with_default": true
   }
   ```
@@ -175,7 +175,7 @@ Custom status line script [`agyStatusline.py`](./agyStatusline.py) (folder, bran
   ```bash
   ln -sf /mnt/c/Users/Michael/projects/window-cleaner/agyStatusline.py ~/.gemini/antigravity-cli/agyStatusline.py
   ```
-  and set `"command": "python3 -u ~/.gemini/antigravity-cli/agyStatusline.py"` in WSL's `settings.json`.
+  and set `"command": "python3 -S -u ~/.gemini/antigravity-cli/agyStatusline.py"` in WSL's `settings.json`.
 
 ## Configurations
 
