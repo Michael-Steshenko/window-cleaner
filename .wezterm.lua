@@ -79,8 +79,8 @@ config.colors = {
 }
 
 config.font = wezterm.font_with_fallback({
+  'JetBrains Mono',
   'Cascadia Mono',
-  'Cascadia Code',
   'Segoe UI Emoji',
   'Segoe UI Symbol',
   'Consolas',
