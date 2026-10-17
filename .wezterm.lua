@@ -10,6 +10,7 @@ local config = wezterm.config_builder()
 config.window_decorations = 'INTEGRATED_BUTTONS | RESIZE'
 config.integrated_title_button_style = 'Windows'
 config.integrated_title_button_alignment = 'Right'
+config.show_tab_index_in_tab_bar = false
 
 -- Disable confirmation popups when closing window or tabs
 config.window_close_confirmation = 'NeverPrompt'
@@ -105,11 +106,11 @@ config.launch_menu = {
     args = { 'pwsh.exe', '-NoLogo' },
   },
   {
-    label = 'Command Prompt',
+    label = 'CMD',
     args = { 'cmd.exe' },
   },
   {
-    label = 'Arch Linux',
+    label = 'Arch',
     args = { 'wsl.exe', '-d', 'archlinux', '--cd', '~' },
   },
 }
@@ -135,6 +136,103 @@ end
 local last_cwd = get_last_cwd()
 if last_cwd then
   config.default_cwd = last_cwd
+end
+
+-- 5. Profile Detection & Tab Titles (PowerShell, Arch, CMD)
+--------------------------------------------------------------------------------
+local function get_pane_profile(pane)
+  if not pane then
+    return 'PowerShell'
+  end
+
+  -- 1. Check WSL / domain name (e.g. WSL:archlinux)
+  local domain = ''
+  if type(pane.get_domain_name) == 'function' then
+    pcall(function() domain = (pane:get_domain_name() or ''):lower() end)
+  elseif type(pane.domain_name) == 'string' then
+    domain = pane.domain_name:lower()
+  end
+  if domain:find('arch') or domain:find('wsl') then
+    return 'Arch'
+  end
+
+  -- 2. Check process tree (walk up parents to find root shell: pwsh, cmd, wsl)
+  -- On Windows, WezTerm returns the most recent descendant as foreground process.
+  -- Walking up the parent process chain via ppid reliably finds the underlying shell even if an app (like agy.exe) is running.
+  local proc_info = nil
+  if type(pane.get_foreground_process_info) == 'function' then
+    pcall(function() proc_info = pane:get_foreground_process_info() end)
+  end
+  local current = proc_info
+  local depth = 0
+  while current and depth < 10 do
+    local exe = (current.executable or current.name or ''):lower()
+    if exe:find('wsl') then
+      return 'Arch'
+    elseif exe:find('pwsh') or exe:find('powershell') then
+      return 'PowerShell'
+    elseif exe:find('cmd%.exe') or exe == 'cmd' then
+      return 'CMD'
+    end
+
+    if current.ppid and current.ppid > 0 and wezterm.procinfo and wezterm.procinfo.get_info_for_pid then
+      local parent = nil
+      pcall(function()
+        parent = wezterm.procinfo.get_info_for_pid(current.ppid)
+      end)
+      if parent and parent.pid ~= current.pid then
+        current = parent
+      else
+        break
+      end
+    else
+      break
+    end
+    depth = depth + 1
+  end
+
+  -- 3. Check foreground process name directly
+  local proc_name = ''
+  if type(pane.get_foreground_process_name) == 'function' then
+    pcall(function() proc_name = (pane:get_foreground_process_name() or ''):lower() end)
+  elseif type(pane.foreground_process_name) == 'string' then
+    proc_name = pane.foreground_process_name:lower()
+  end
+  if proc_name:find('wsl') then
+    return 'Arch'
+  elseif proc_name:find('pwsh') or proc_name:find('powershell') then
+    return 'PowerShell'
+  elseif proc_name:find('cmd') then
+    return 'CMD'
+  end
+
+  -- 4. Check CWD (Linux/WSL paths vs Windows paths)
+  local cwd_uri = nil
+  if type(pane.get_current_working_dir) == 'function' then
+    pcall(function() cwd_uri = pane:get_current_working_dir() end)
+  elseif pane.current_working_dir then
+    cwd_uri = pane.current_working_dir
+  end
+  if cwd_uri then
+    local host = cwd_uri.host or ''
+    local path = cwd_uri.file_path or ''
+    if (host ~= '' and host ~= 'localhost') or path:find('^/home') or (not path:find('^[A-Za-z]:') and not path:find('^/[A-Za-z]:')) then
+      return 'Arch'
+    end
+  end
+
+  -- 5. Check pane title heuristic (e.g. WSL prompt emits user@host:path)
+  local title = ''
+  if type(pane.get_title) == 'function' then
+    pcall(function() title = pane:get_title() or '' end)
+  elseif type(pane.title) == 'string' then
+    title = pane.title
+  end
+  if title:find('^[^@]+@[^:]+:') then
+    return 'Arch'
+  end
+
+  return 'PowerShell'
 end
 
 -- Save CWD whenever navigating to a new folder & toggle scrollbar dynamically
@@ -165,49 +263,82 @@ wezterm.on('update-status', function(window, pane)
       end
     end
   end
+
+  -- 3. Enforce profile name as tab title across all tabs (PowerShell, Arch, CMD)
+  pcall(function()
+    local mux_win = window:mux_window()
+    if mux_win then
+      for _, t in ipairs(mux_win:tabs()) do
+        local tab_pane = (t.active_pane and t:active_pane()) or (t.panes and t:panes()[1])
+        if tab_pane then
+          local profile = get_pane_profile(tab_pane)
+          if t:get_title() ~= profile then
+            t:set_title(profile)
+          end
+        end
+      end
+    end
+  end)
+end)
+
+-- Format tab title event (ensures profile name is always displayed with relaxed padding)
+wezterm.on('format-tab-title', function(tab, tabs, panes, cfg, hover, max_width)
+  local profile = (tab.tab_title and #tab.tab_title > 0) and tab.tab_title or get_pane_profile(tab.active_pane)
+  return '     ' .. profile .. '     '
 end)
 
 --------------------------------------------------------------------------------
--- 5. Helper: Open Window / Tab in Current Environment & Path
+-- 6. Helper: Open Window / Tab in Current Environment & Path
 --------------------------------------------------------------------------------
 local function get_current_env_and_cwd(pane)
-  local proc = (pane:get_foreground_process_name() or ''):lower()
+  local profile = get_pane_profile(pane)
 
-  local cwd_uri = pane:get_current_working_dir()
+  local cwd_uri = nil
+  if type(pane.get_current_working_dir) == 'function' then
+    pcall(function() cwd_uri = pane:get_current_working_dir() end)
+  elseif pane.current_working_dir then
+    cwd_uri = pane.current_working_dir
+  end
   local cwd = cwd_uri and cwd_uri.file_path or nil
   if cwd then
     cwd = cwd:gsub('^/([A-Za-z]:)', '%1')
   end
 
   local args = { 'pwsh.exe', '-NoLogo' }
-  if proc:find('wsl') then
+  if profile == 'Arch' then
     if cwd and cwd ~= '' then
-      args = { 'wsl.exe', '-d', 'archlinux', '--cd', cwd }
+      args = { 'wsl.exe', '-d', 'Arch', '--cd', cwd }
     else
-      args = { 'wsl.exe', '-d', 'archlinux', '--cd', '~' }
+      args = { 'wsl.exe', '-d', 'Arch', '--cd', '~' }
     end
     cwd = nil -- wsl.exe handles directory switching via --cd
-  elseif proc:find('cmd') then
+  elseif profile == 'CMD' then
     args = { 'cmd.exe' }
   end
 
-  return args, cwd
+  return args, cwd, profile
 end
 
 wezterm.on('spawn-window-current-env', function(window, pane)
-  local args, cwd = get_current_env_and_cwd(pane)
-  wezterm.mux.spawn_window {
+  local args, cwd, profile = get_current_env_and_cwd(pane)
+  local mux_tab, mux_pane, mux_win = wezterm.mux.spawn_window {
     args = args,
     cwd = cwd,
   }
+  if mux_tab and profile then
+    mux_tab:set_title(profile)
+  end
 end)
 
 wezterm.on('spawn-tab-current-env', function(window, pane)
-  local args, cwd = get_current_env_and_cwd(pane)
-  window:mux_window():spawn_tab {
+  local args, cwd, profile = get_current_env_and_cwd(pane)
+  local mux_tab, mux_pane, mux_win = window:mux_window():spawn_tab {
     args = args,
     cwd = cwd,
   }
+  if mux_tab and profile then
+    mux_tab:set_title(profile)
+  end
 end)
 
 --------------------------------------------------------------------------------
