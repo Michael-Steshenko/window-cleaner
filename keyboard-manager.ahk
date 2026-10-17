@@ -87,11 +87,101 @@ ExpandEnvVars(str) {
     return str
 }
 
+; Get true visual bounds of window (excluding invisible DWM drop shadows)
+GetWindowVisualRect(hwnd) {
+    try {
+        if (WinGetMinMax("ahk_id " hwnd) = 1) {
+            WinGetPos(&wx, &wy, &ww, &wh, hwnd)
+            midX := wx + ww // 2
+            midY := wy + wh // 2
+            Loop MonitorGetCount() {
+                MonitorGetWorkArea(A_Index, &mLeft, &mTop, &mRight, &mBottom)
+                if (midX >= mLeft && midX <= mRight && midY >= mTop && midY <= mBottom)
+                    return { left: mLeft, top: mTop, right: mRight, bottom: mBottom }
+            }
+        }
+
+        rect := Buffer(16, 0)
+        ; DWMWA_EXTENDED_FRAME_BOUNDS = 9
+        if (DllCall("dwmapi\DwmGetWindowAttribute", "Ptr", hwnd, "UInt", 9, "Ptr", rect, "UInt", 16) = 0) {
+            return {
+                left: NumGet(rect, 0, "Int"),
+                top: NumGet(rect, 4, "Int"),
+                right: NumGet(rect, 8, "Int"),
+                bottom: NumGet(rect, 12, "Int")
+            }
+        }
+        WinGetPos(&x, &y, &w, &h, hwnd)
+        return { left: x, top: y, right: x + w, bottom: y + h }
+    }
+    return { left: 0, top: 0, right: 0, bottom: 0 }
+}
+
+; Check if cursor is currently within the visual bounds of the window
+IsCursorInsideWindow(hwnd) {
+    try {
+        if (WinGetMinMax("ahk_id " hwnd) = -1)
+            return false
+
+        pt := Buffer(8, 0)
+        DllCall("GetCursorPos", "Ptr", pt)
+        curX := NumGet(pt, 0, "Int")
+        curY := NumGet(pt, 4, "Int")
+
+        vRect := GetWindowVisualRect(hwnd)
+        return (curX >= vRect.left && curX <= vRect.right && curY >= vRect.top && curY <= vRect.bottom)
+    }
+    return false
+}
+
+; Move mouse cursor to the middle of the specified window
+MoveCursorToWindowCenter(hwnd) {
+    try {
+        if (WinGetMinMax("ahk_id " hwnd) = -1)
+            return
+
+        Loop 10 {
+            vRect := GetWindowVisualRect(hwnd)
+            if (vRect.right > vRect.left && vRect.bottom > vRect.top)
+                break
+            Sleep 20
+        }
+
+        if (vRect.right <= vRect.left || vRect.bottom <= vRect.top)
+            return
+
+        midX := (vRect.left + vRect.right) // 2
+        midY := (vRect.top + vRect.bottom) // 2
+
+        DllCall("SetCursorPos", "Int", midX, "Int", midY)
+        CoordMode("Mouse", "Screen")
+        MouseMove(midX, midY, 0)
+    }
+}
+
+; Navigate to target window: focus it and move cursor to middle.
+; If target is already the focused window and cursor is already inside it, do nothing.
+NavigateToWindow(target) {
+    activeHwnd := WinActive("A")
+    alreadyFocused := (activeHwnd && (activeHwnd = target))
+
+    if (!alreadyFocused) {
+        if (WinGetMinMax("ahk_id " target) = -1)
+            WinRestore("ahk_id " target)
+        WinActivate("ahk_id " target)
+        WinWaitActive("ahk_id " target, , 0.5)
+    }
+
+    cursorInside := IsCursorInsideWindow(target)
+    if !(alreadyFocused && cursorInside)
+        MoveCursorToWindowCenter(target)
+}
+
 ; Function to launch or cycle through app windows
 LaunchOrCycle(apps) {
     apps := (Type(apps) = "String") ? [apps] : apps
 
-    ; Build a set of target exe names
+    ; Build a set of target exe names (with special cases)
     exeSet := Map()
     for app in apps {
         exe := StrLower(NormalizeExe(app))
@@ -130,10 +220,21 @@ LaunchOrCycle(apps) {
             try {
                 Run(ExpandEnvVars(apps[1]))
                 ; Wait for window to appear and focus it
-                for exe in exeSet {
-                    if WinWait("ahk_exe " exe, , 3) {
-                        WinActivate("ahk_exe " exe)
-                        break
+                waitTitle := hasExplorer ? "ahk_class CabinetWClass" : ""
+                if (waitTitle != "") {
+                    if (hwnd := WinWait(waitTitle, , 3)) {
+                        WinActivate("ahk_id " hwnd)
+                        WinWaitActive("ahk_id " hwnd, , 1)
+                        MoveCursorToWindowCenter(hwnd)
+                    }
+                } else {
+                    for exe in exeSet {
+                        if (hwnd := WinWait("ahk_exe " exe, , 3)) {
+                            WinActivate("ahk_id " hwnd)
+                            WinWaitActive("ahk_id " hwnd, , 1)
+                            MoveCursorToWindowCenter(hwnd)
+                            break
+                        }
                     }
                 }
             }
@@ -142,7 +243,7 @@ LaunchOrCycle(apps) {
     }
 
     ; Check if active window is one of our target apps
-    activeHwnd := WinGetID("A")
+    activeHwnd := WinActive("A")
     activeIsTarget := false
     for hwnd in allWindows {
         if (hwnd = activeHwnd) {
@@ -157,9 +258,7 @@ LaunchOrCycle(apps) {
     else
         target := allWindows[1]  ; Top of Z-order (most recent)
 
-    if (WinGetMinMax("ahk_id " target) = -1)
-        WinRestore("ahk_id " target)
-    WinActivate("ahk_id " target)
+    NavigateToWindow(target)
 }
 
 ; ============================================================================
@@ -230,21 +329,6 @@ terminalApps := ReadAppList("Terminal")
 *q:: WinClose("A")
 
 ; Window Management, Hyper + h/j/k/l maps to Win + arrow keys
-; Get true visual bounds of window (excluding invisible DWM drop shadows)
-GetWindowVisualRect(hwnd) {
-    rect := Buffer(16, 0)
-    ; DWMWA_EXTENDED_FRAME_BOUNDS = 9
-    if (DllCall("dwmapi\DwmGetWindowAttribute", "Ptr", hwnd, "UInt", 9, "Ptr", rect, "UInt", 16) = 0) {
-        return {
-            left: NumGet(rect, 0, "Int"),
-            top: NumGet(rect, 4, "Int"),
-            right: NumGet(rect, 8, "Int"),
-            bottom: NumGet(rect, 12, "Int")
-        }
-    }
-    WinGetPos(&x, &y, &w, &h, hwnd)
-    return { left: x, top: y, right: x + w, bottom: y + h }
-}
 
 MoveZone(dir) {
     try {
