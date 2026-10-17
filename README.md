@@ -34,10 +34,16 @@ Recommended, set up things in arch in the following order:
 
   - Add this to your `~/.bashrc`:
 
-  ```
+  ```bash
   # set default editor
   export EDITOR=nvim
   export VISUAL=nvim
+
+  # Report current working directory to terminal via OSC 7 (for WezTerm path detection)
+  __vte_osc7() {
+      printf '\e]7;file://%s%s\e\\' "$HOSTNAME" "$PWD"
+  }
+  PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }__vte_osc7"
   ```
 
   - Run `visudo` and uncomment: `%wheel ALL=(ALL:ALL) ALL`
@@ -89,19 +95,27 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
    `git config --global credential.helper "/mnt/c/Users/Michael/AppData/Local/Microsoft/WinGet/Packages/Git.MinGit_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/git-credential-manager.exe"`  
   taken from [here](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md#configuring-wsl-with-git-for-windows-recommended)
 
-### Windows Terminal
+### WezTerm
 
-`winget install Microsoft.WindowsTerminal`
+- Install: `winget install wez.wezterm`
+- The configuration file [`.wezterm.lua`](./.wezterm.lua) is in this repository and symlinked to `~/.wezterm.lua` via `install.cmd`.
+- Key features configured:
+  - Unified title bar: tabs and Windows-style minimize/maximize/close buttons on a single top bar.
+  - Preconfigured profiles: PowerShell 7, Command Prompt, and Arch Linux (WSL).
+  - `Ctrl + N` / `Ctrl + T`: Opens a new window or tab inheriting both the active environment (WSL / PWSH / CMD) and the current working directory.
+  - Smart `Ctrl + C`: Copies when text is selected, sends interrupt (`^C`) when nothing is selected; `Ctrl + V` pastes.
+  - Automatic directory tracking: Remembers the last visited directory across restarts without third-party plugins.
+  - Fast tab closing: Window and tab close confirmation modals are disabled.
+  - Custom Campbell palette and Cascadia font matching Windows Terminal.
 
 ### Powershell 7
 
-`winget install Microsoft.Powershell`
-
-#### Better PowerShell autocomplete command history
-
-- `nvim $PROFILE`
-- add this line: `Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView`
-- restart powershell
+- Install: `winget install Microsoft.Powershell`
+- The profile configuration [`Microsoft.PowerShell_profile.ps1`](./Microsoft.PowerShell_profile.ps1) is stored in this repository and symlinked to `~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` via `install.cmd`.
+- Profile features:
+  - Better command history autocomplete (`Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView`).
+  - Terminal OSC 7 working directory reporting for WezTerm path detection.
+  - `agy` alias that always passes `--remote-control` flag.
 
 ### PowerToys
 
@@ -139,7 +153,9 @@ To install the script to run on startup run the `install.cmd` script or manually
 - Notice that the values in the string are semi-colon seperated.
 
 ### CLI tools for AI agents
+
 My working theory is that AI agnets prefer Unix tools, and not all the tools are available on winget, so we use scoop.
+
 - install [scoop](https://scoop.sh/)
 - `scoop install findutils uutils-coreutils sed gawk grep ripgrep`
 
