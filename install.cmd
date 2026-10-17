@@ -7,6 +7,9 @@
 @echo off
 setlocal
 
+:: Define ANSI escape sequence for colors
+for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1) do rem"') do set "ESC=%%b"
+
 :: Check for Administrator privileges
 net session >nul 2>&1
 if %errorLevel% neq 0 (
@@ -30,7 +33,7 @@ set "PS_DIR=%USERPROFILE%\Documents\PowerShell"
 set "PS_TARGET=%~dp0Microsoft.PowerShell_profile.ps1"
 set "PS_LINK=%PS_DIR%\Microsoft.PowerShell_profile.ps1"
 
-:: Create cofig.ini or verify it exists 
+:: Create config.ini or verify it exists 
 echo.
 echo Checking configuration...
 if exist "%CONFIG_FILE%" (
@@ -40,90 +43,47 @@ if exist "%CONFIG_FILE%" (
         copy "%CONFIG_TEMPLATE%" "%CONFIG_FILE%" >nul
         echo Config file created from template.
     ) else (
-        echo Warning: Template config file not found.
+        echo %ESC%[93mWarning: Template config file not found.%ESC%[0m
     )
 )
 echo.
 
-:: Create keyboard-manager.ahk symlink in statup apps folder
-echo Creating link at: %LINK%
-
-:: Check if link or file already exists
-if exist "%LINK%" (
-    echo Error: A file or link already exists at %LINK%.
-    echo Please remove it first.
-    pause
-    exit /b 1
-)
-
-:: Create the symbolic link
-mklink "%LINK%" "%TARGET%" >nul
-if %errorLevel% neq 0 (
-    echo Failed to create symlink.
-    pause
-    exit /b 1
-)
-
-:: Create agyStatusline.py symlink in Antigravity CLI config folder
-if not exist "%AGY_DIR%" mkdir "%AGY_DIR%"
-echo Creating link at: %AGY_LINK%
-
-:: Check if link or file already exists
-if exist "%AGY_LINK%" (
-    echo Error: A file or link already exists at %AGY_LINK%.
-    echo Please remove it first.
-    pause
-    exit /b 1
-)
-
-:: Create the symbolic link
-mklink "%AGY_LINK%" "%AGY_TARGET%" >nul
-if %errorLevel% neq 0 (
-    echo Failed to create symlink.
-    pause
-    exit /b 1
-)
-
-:: Create .wezterm.lua symlink in user profile folder
-echo Creating link at: %WEZTERM_LINK%
-
-:: Check if link or file already exists
-if exist "%WEZTERM_LINK%" (
-    echo Error: A file or link already exists at %WEZTERM_LINK%.
-    echo Please remove it first.
-    pause
-    exit /b 1
-)
-
-:: Create the symbolic link
-mklink "%WEZTERM_LINK%" "%WEZTERM_TARGET%" >nul
-if %errorLevel% neq 0 (
-    echo Failed to create symlink.
-    pause
-    exit /b 1
-)
-
-:: Create Microsoft.PowerShell_profile.ps1 symlink in PowerShell folder
-if not exist "%PS_DIR%" mkdir "%PS_DIR%"
-echo Creating link at: %PS_LINK%
-
-:: Check if link or file already exists
-if exist "%PS_LINK%" (
-    echo Error: A file or link already exists at %PS_LINK%.
-    echo Please remove it first.
-    pause
-    exit /b 1
-)
-
-:: Create the symbolic link
-mklink "%PS_LINK%" "%PS_TARGET%" >nul
-if %errorLevel% neq 0 (
-    echo Failed to create symlink.
-    pause
-    exit /b 1
-)
+:: Create symlinks
+set "ERRORS=0"
+call :CreateSymlink "%TARGET%" "%LINK%"
+call :CreateSymlink "%AGY_TARGET%" "%AGY_LINK%"
+call :CreateSymlink "%WEZTERM_TARGET%" "%WEZTERM_LINK%"
+call :CreateSymlink "%PS_TARGET%" "%PS_LINK%"
 
 echo.
-echo Success
+if %ERRORS% gtr 0 (
+    echo Installation finished with errors.
+) else (
+    echo Success
+)
 pause
+exit /b 0
 
+:: Helper function to create a symlink with directory creation and collision check
+:CreateSymlink
+set "SRC=%~1"
+set "DST=%~2"
+set "DST_DIR=%~dp2"
+
+if not exist "%DST_DIR%" mkdir "%DST_DIR%"
+echo Creating link at: %DST%
+
+:: Check if link or file already exists
+if exist "%DST%" (
+    echo %ESC%[93mWarning: A file or link already exists at %DST%.%ESC%[0m
+    exit /b 0
+)
+
+:: Create the symbolic link
+mklink "%DST%" "%SRC%" >nul
+if %errorLevel% neq 0 (
+    echo Error: Failed to create symlink at %DST%.
+    set /a ERRORS+=1
+    exit /b 1
+)
+exit /b 0
