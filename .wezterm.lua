@@ -20,7 +20,7 @@ config.window_background_opacity = 0.95
 -- font_size controls the overall height of the fancy title bar and tabs
 -- Titlebar background uses the default color so it matches the unselected tab background
 config.window_frame = {
-  font_size = 13.0,
+  font_size = 12.0,
 }
 
 -- Disable confirmation popups when closing window or tabs
