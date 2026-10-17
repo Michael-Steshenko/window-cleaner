@@ -107,6 +107,7 @@ This lets you run VS Code’s UI on Windows, and all your commands, extensions, 
   - Automatic directory tracking: Remembers the last visited directory across restarts without third-party plugins.
   - Fast tab closing: Window and tab close confirmation modals are disabled.
   - Custom Campbell palette and Cascadia font matching Windows Terminal.
+  - Dynamic scroll position indicator: Thin (6px) scrollbar automatically shown only when offscreen scrollback exists (hidden on full-screen / no history).
 
 ### Powershell 7
 

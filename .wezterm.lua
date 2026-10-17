@@ -32,6 +32,19 @@ wezterm.on('mux-is-process-stateful', function(proc)
   return false
 end)
 
+-- Scroll position indicator (scrollbar)
+-- Dynamically shown only when scrollback history exists (via update-status)
+config.enable_scroll_bar = false
+config.min_scroll_bar_height = '2cell'
+
+-- Sleek window padding; right padding controls scrollbar width (thin indicator)
+config.window_padding = {
+  left = 4,
+  right = '6px',
+  top = 2,
+  bottom = 2,
+}
+
 -- Windows Terminal exact colors (Campbell) and font (Cascadia Mono)
 config.colors = {
   foreground = '#CCCCCC',
@@ -41,6 +54,7 @@ config.colors = {
   cursor_border = '#FFFFFF',
   selection_fg = '#FFFFFF',
   selection_bg = '#767676',
+  scrollbar_thumb = '#666666',
 
   ansi = {
     '#0C0C0C', -- black
@@ -123,9 +137,19 @@ if last_cwd then
   config.default_cwd = last_cwd
 end
 
--- Save CWD whenever navigating to a new folder
+-- Save CWD whenever navigating to a new folder & toggle scrollbar dynamically
 local cached_cwd = last_cwd
 wezterm.on('update-status', function(window, pane)
+  -- 1. Dynamic scrollbar: only show when there is offscreen scrollback and not in alt-screen (e.g. vim/agy)
+  local dims = pane:get_dimensions()
+  local has_scrollback = dims.scrollback_rows > dims.viewport_rows and not pane:is_alt_screen_active()
+  local overrides = window:get_config_overrides() or {}
+  if overrides.enable_scroll_bar ~= has_scrollback then
+    overrides.enable_scroll_bar = has_scrollback
+    window:set_config_overrides(overrides)
+  end
+
+  -- 2. Save CWD whenever navigating to a new folder
   local cwd_uri = pane:get_current_working_dir()
   if cwd_uri then
     local path = cwd_uri.file_path
