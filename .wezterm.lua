@@ -41,8 +41,8 @@ config.min_scroll_bar_height = '2cell'
 config.window_padding = {
   left = 4,
   right = '6px',
-  top = 2,
-  bottom = 2,
+  top = 16,
+  bottom = 0,
 }
 
 -- Windows Terminal exact colors (Campbell) and font (Cascadia Mono)
