@@ -143,6 +143,24 @@ My working theory is that AI agnets prefer Unix tools, and not all the tools are
 - install [scoop](https://scoop.sh/)
 - `scoop install findutils uutils-coreutils sed gawk grep ripgrep`
 
+### Antigravity CLI (`agy`)
+
+Custom status line script [`agyStatusline.py`](./agyStatusline.py) (folder, branch, context %, quotas).
+
+- **Windows**: Run `install.cmd` to symlink to `~/.gemini/antigravity-cli/agyStatusline.py`, and set in `settings.json`:
+  ```json
+  "statusLine": {
+    "type": "command",
+    "command": "python -u C:/Users/Michael/.gemini/antigravity-cli/agyStatusline.py",
+    "stack_with_default": true
+  }
+  ```
+- **WSL**: Symlink to the Windows repo:
+  ```bash
+  ln -sf /mnt/c/Users/Michael/projects/window-cleaner/agyStatusline.py ~/.gemini/antigravity-cli/agyStatusline.py
+  ```
+  and set `"command": "python3 -u ~/.gemini/antigravity-cli/agyStatusline.py"` in WSL's `settings.json`.
+
 ## Configurations
 
 ### Setting up enviorment variables in WSL
