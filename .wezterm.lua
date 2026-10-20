@@ -95,12 +95,7 @@ config.font = wezterm.font_with_fallback({
 config.font_size = 12.0
 
 --------------------------------------------------------------------------------
--- 2. Keyboard Protocol (Kitty protocol for agy Shift+Tab / Shift+Enter)
---------------------------------------------------------------------------------
-config.enable_kitty_keyboard = true
-
---------------------------------------------------------------------------------
--- 3. Profiles: PowerShell, CMD, Arch Linux
+-- 2. Profiles: PowerShell, CMD, Arch Linux
 --------------------------------------------------------------------------------
 -- Default shell on startup
 config.default_prog = { 'pwsh.exe', '-NoLogo' }
@@ -122,7 +117,7 @@ config.launch_menu = {
 }
 
 --------------------------------------------------------------------------------
--- 4. Remember Last Working Directory (Lightweight, No Plugins)
+-- 3. Remember Last Working Directory (Lightweight, No Plugins)
 --------------------------------------------------------------------------------
 local last_cwd_file = wezterm.home_dir .. '/.wezterm_last_cwd'
 
@@ -144,7 +139,7 @@ if last_cwd then
   config.default_cwd = last_cwd
 end
 
--- 5. Profile Detection & Tab Titles (PowerShell, Arch, CMD)
+-- 4. Profile Detection & Tab Titles (PowerShell, Arch, CMD)
 --------------------------------------------------------------------------------
 local function get_pane_profile(pane)
   if not pane then
@@ -319,7 +314,7 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, cfg, hover, max_width)
 end)
 
 --------------------------------------------------------------------------------
--- 6. Helper: Open Window / Tab in Current Environment & Path
+-- 5. Helper: Open Window / Tab in Current Environment & Path
 --------------------------------------------------------------------------------
 local function get_current_env_and_cwd(pane)
   local profile = get_pane_profile(pane)
@@ -380,7 +375,7 @@ wezterm.on('spawn-tab-current-env', function(window, pane)
 end)
 
 --------------------------------------------------------------------------------
--- 7. Command Palette & Environment Picker Helpers
+-- 6. Command Palette & Environment Picker Helpers
 --------------------------------------------------------------------------------
 -- Inject "Shell: <Profile> (New Window)" actions into the Command Palette (Ctrl+Shift+P)
 wezterm.on('augment-command-palette', function(window, pane)
@@ -441,7 +436,7 @@ local function build_env_choices()
 end
 
 --------------------------------------------------------------------------------
--- 8. Keybindings
+-- 7. Keybindings
 --------------------------------------------------------------------------------
 config.keys = {
   -- Ctrl + N: Open new window in same environment (WSL / PWSH / CMD) and same path
