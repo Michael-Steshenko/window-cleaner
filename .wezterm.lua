@@ -13,14 +13,12 @@ config.integrated_title_button_alignment = 'Right'
 config.show_tab_index_in_tab_bar = false
 config.use_fancy_tab_bar = true
 
--- Windows 11 Fluent frame styling (Tabbed backdrop & opacity)
-config.win32_system_backdrop = 'Tabbed'
-config.window_background_opacity = 0.95
-
 -- font_size controls the overall height of the fancy title bar and tabs
--- Titlebar background uses the default color so it matches the unselected tab background
+-- Titlebar background matches Kanagawa theme background (#1F1F28)
 config.window_frame = {
   font_size = 12.0,
+  active_titlebar_bg = '#1F1F28',
+  inactive_titlebar_bg = '#1F1F28',
 }
 
 -- Disable confirmation popups when closing window or tabs
@@ -57,36 +55,33 @@ config.window_padding = {
   bottom = 0,
 }
 
--- Windows Terminal exact colors (Campbell) and font (Cascadia Mono)
+-- Modern popular dark color scheme
+config.color_scheme = 'Kanagawa (Gogh)'
 config.colors = {
-  foreground = '#CCCCCC',
-  background = '#0C0C0C',
-  cursor_bg = '#FFFFFF',
-  cursor_fg = '#0C0C0C',
-  cursor_border = '#FFFFFF',
-  selection_fg = '#FFFFFF',
-  selection_bg = '#767676',
-  scrollbar_thumb = '#666666',
-
-  ansi = {
-    '#0C0C0C', -- black
-    '#C50F1F', -- red
-    '#13A10E', -- green
-    '#C19C00', -- yellow
-    '#0037DA', -- blue
-    '#881798', -- purple
-    '#3A96DD', -- cyan
-    '#CCCCCC', -- white
-  },
-  brights = {
-    '#767676', -- brightBlack
-    '#E74856', -- brightRed
-    '#16C60C', -- brightGreen
-    '#F9F1A5', -- brightYellow
-    '#3B78FF', -- brightBlue
-    '#B4009E', -- brightPurple
-    '#61D6D6', -- brightCyan
-    '#F2F2F2', -- brightWhite
+  scrollbar_thumb = '#4A4A5F',
+  tab_bar = {
+    background = '#1F1F28',
+    inactive_tab_edge = '#2B2B36',
+    active_tab = {
+      bg_color = '#383947', -- Level 2 elevated surface for active tab
+      fg_color = '#DCD7BA',
+    },
+    inactive_tab = {
+      bg_color = '#1F1F28', -- Recedes into titlebar
+      fg_color = '#5D5D77', -- Muted inactive text
+    },
+    inactive_tab_hover = {
+      bg_color = '#2B2B36', -- Level 1 subtle lift on hover
+      fg_color = '#8D8DB4', -- Soft lavender highlight on hover
+    },
+    new_tab = {
+      bg_color = '#1F1F28',
+      fg_color = '#5D5D77',
+    },
+    new_tab_hover = {
+      bg_color = '#2B2B36',
+      fg_color = '#8D8DB4',
+    },
   },
 }
 
@@ -307,15 +302,18 @@ local function get_profile_icon_and_color(profile)
   return (wezterm.nerdfonts.cod_terminal or '>_'), '#FFFFFF'
 end
 
--- Format tab title event: displays Windows Terminal profile icon + tab name in pure white
+-- Format tab title event: displays profile icon + tab name
 wezterm.on('format-tab-title', function(tab, tabs, panes, cfg, hover, max_width)
   local profile = (tab.tab_title and #tab.tab_title > 0) and tab.tab_title or get_pane_profile(tab.active_pane)
   local icon, icon_color = get_profile_icon_and_color(profile)
+  local is_active = tab.is_active
+  local text_color = is_active and '#DCD7BA' or (hover and '#8D8DB4' or '#5D5D77')
+  local display_icon_color = is_active and icon_color or (hover and '#8D8DB4' or '#5D5D77')
   return {
     { Text = '   ' },
-    { Foreground = { Color = icon_color } },
+    { Foreground = { Color = display_icon_color } },
     { Text = icon },
-    { Foreground = { Color = '#FFFFFF' } },
+    { Foreground = { Color = text_color } },
     { Text = '  ' .. profile .. '     ' },
   }
 end)
