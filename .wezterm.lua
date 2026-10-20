@@ -375,7 +375,68 @@ wezterm.on('spawn-tab-current-env', function(window, pane)
 end)
 
 --------------------------------------------------------------------------------
--- 6. Keybindings
+-- 7. Command Palette & Environment Picker Helpers
+--------------------------------------------------------------------------------
+-- Inject "Shell: <Profile> (New Window)" actions into the Command Palette (Ctrl+Shift+P)
+wezterm.on('augment-command-palette', function(window, pane)
+  local entries = {}
+  for _, item in ipairs(config.launch_menu) do
+    local is_wsl = false
+    if item.args then
+      for _, arg in ipairs(item.args) do
+        if tostring(arg):lower():find('wsl') then
+          is_wsl = true
+          break
+        end
+      end
+    end
+
+    local icon_name = 'cod_terminal'
+    local lower = item.label:lower()
+    if lower:find('pwsh') or lower:find('power') then
+      icon_name = 'md_powershell'
+    elseif lower:find('cmd') then
+      icon_name = 'cod_terminal_cmd'
+    elseif lower:find('arch') or is_wsl then
+      icon_name = 'linux_archlinux'
+    end
+
+    local display_label = item.label .. (is_wsl and ' (WSL)' or '')
+    table.insert(entries, {
+      brief = 'Shell: ' .. display_label .. ' (New Window)',
+      icon = icon_name,
+      action = act.SpawnCommandInNewWindow {
+        args = item.args,
+      },
+    })
+  end
+  return entries
+end)
+
+local function build_env_choices()
+  local choices = {}
+  for idx, item in ipairs(config.launch_menu) do
+    local is_wsl = false
+    if item.args then
+      for _, arg in ipairs(item.args) do
+        if tostring(arg):lower():find('wsl') then
+          is_wsl = true
+          break
+        end
+      end
+    end
+    local icon = get_profile_icon_and_color(item.label)
+    local display_label = item.label .. (is_wsl and ' (WSL)' or '')
+    table.insert(choices, {
+      id = tostring(idx),
+      label = icon .. '  ' .. display_label,
+    })
+  end
+  return choices
+end
+
+--------------------------------------------------------------------------------
+-- 8. Keybindings
 --------------------------------------------------------------------------------
 config.keys = {
   -- Ctrl + N: Open new window in same environment (WSL / PWSH / CMD) and same path
@@ -383,6 +444,25 @@ config.keys = {
     key = 'n',
     mods = 'CTRL',
     action = act.EmitEvent('spawn-window-current-env'),
+  },
+  -- Ctrl + Shift + N: Quick environment picker to spawn a new window
+  {
+    key = 'n',
+    mods = 'CTRL|SHIFT',
+    action = act.InputSelector {
+      title = 'Open New Window In...',
+      choices = build_env_choices(),
+      fuzzy = true,
+      action = wezterm.action_callback(function(window, pane, id, label)
+        if not id then return end
+        local item = config.launch_menu[tonumber(id)]
+        if item then
+          window:perform_action(act.SpawnCommandInNewWindow {
+            args = item.args,
+          }, pane)
+        end
+      end),
+    },
   },
   -- Ctrl + T: Open new tab in same environment and same path
   {
