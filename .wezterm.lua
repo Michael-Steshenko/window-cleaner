@@ -339,11 +339,18 @@ local function get_current_env_and_cwd(pane)
 
   local args = { 'pwsh.exe', '-NoLogo' }
   if profile == 'Arch' then
+    local cd_target = '~'
     if cwd and cwd ~= '' then
-      args = { 'wsl.exe', '-d', 'Arch', '--cd', cwd }
-    else
-      args = { 'wsl.exe', '-d', 'Arch', '--cd', '~' }
+      local drive, rest = cwd:match('^/mnt/([A-Za-z])/(.*)')
+      if drive and rest then
+        cd_target = drive:upper() .. ':\\' .. rest:gsub('/', '\\')
+      elseif cwd:match('^[A-Za-z]:') then
+        cd_target = cwd:gsub('/', '\\')
+      else
+        cd_target = cwd
+      end
     end
+    args = { 'wsl.exe', '-d', 'archlinux', '--cd', cd_target }
     cwd = nil -- wsl.exe handles directory switching via --cd
   elseif profile == 'CMD' then
     args = { 'cmd.exe' }
