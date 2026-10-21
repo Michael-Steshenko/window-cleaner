@@ -204,3 +204,5 @@ I was unable to disable the win + "+" and win + "-" shortcuts (Windows 11 Enterp
 - `mv C:\Windows\System32\Magnify.exe C:\Windows\System32\Magnify.exe.bak`
 
 ### TODO
+
+- Remove WezTerm debug logging once we're done investigating a crash: closing one WezTerm PowerShell window froze `wezterm-gui.exe` (cross-process hang on `OpenConsole.exe`) and took down every window. To catch it, `WEZTERM_LOG=info,portable_pty=debug,mux=debug` was set as a user environment variable (`HKCU\Environment`, set via `[Environment]::SetEnvironmentVariable('WEZTERM_LOG', ..., 'User')`). Logs go to `~\.local\share\wezterm\wezterm-gui.exe-log-<pid>.txt`. Remove with `[Environment]::SetEnvironmentVariable('WEZTERM_LOG', $null, 'User')`.
