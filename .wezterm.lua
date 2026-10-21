@@ -141,6 +141,17 @@ end
 
 -- 4. Profile Detection & Tab Titles (PowerShell, Arch, CMD)
 --------------------------------------------------------------------------------
+-- Pane objects and PaneInformation snapshots (format-tab-title) expose different
+-- fields, and indexing an unknown field on either raises an error instead of nil.
+-- Always returns a value (nil on failure), since type() rejects an empty argument list.
+local function try_get(obj, key)
+  local ok, value = pcall(function() return obj[key] end)
+  if ok then
+    return value
+  end
+  return nil
+end
+
 local function get_pane_profile(pane)
   if not pane then
     return 'PowerShell'
@@ -148,9 +159,9 @@ local function get_pane_profile(pane)
 
   -- 1. Check WSL / domain name (e.g. WSL:archlinux)
   local domain = ''
-  if type(pane.get_domain_name) == 'function' then
+  if type(try_get(pane, 'get_domain_name')) == 'function' then
     pcall(function() domain = (pane:get_domain_name() or ''):lower() end)
-  elseif type(pane.domain_name) == 'string' then
+  elseif type(try_get(pane, 'domain_name')) == 'string' then
     domain = pane.domain_name:lower()
   end
   if domain:find('arch') or domain:find('wsl') then
@@ -161,7 +172,7 @@ local function get_pane_profile(pane)
   -- On Windows, WezTerm returns the most recent descendant as foreground process.
   -- Walking up the parent process chain via ppid reliably finds the underlying shell even if an app (like agy.exe) is running.
   local proc_info = nil
-  if type(pane.get_foreground_process_info) == 'function' then
+  if type(try_get(pane, 'get_foreground_process_info')) == 'function' then
     pcall(function() proc_info = pane:get_foreground_process_info() end)
   end
   local current = proc_info
@@ -194,9 +205,9 @@ local function get_pane_profile(pane)
 
   -- 3. Check foreground process name directly
   local proc_name = ''
-  if type(pane.get_foreground_process_name) == 'function' then
+  if type(try_get(pane, 'get_foreground_process_name')) == 'function' then
     pcall(function() proc_name = (pane:get_foreground_process_name() or ''):lower() end)
-  elseif type(pane.foreground_process_name) == 'string' then
+  elseif type(try_get(pane, 'foreground_process_name')) == 'string' then
     proc_name = pane.foreground_process_name:lower()
   end
   if proc_name:find('wsl') then
@@ -209,9 +220,9 @@ local function get_pane_profile(pane)
 
   -- 4. Check CWD (Linux/WSL paths vs Windows paths)
   local cwd_uri = nil
-  if type(pane.get_current_working_dir) == 'function' then
+  if type(try_get(pane, 'get_current_working_dir')) == 'function' then
     pcall(function() cwd_uri = pane:get_current_working_dir() end)
-  elseif pane.current_working_dir then
+  elseif try_get(pane, 'current_working_dir') then
     cwd_uri = pane.current_working_dir
   end
   if cwd_uri then
@@ -224,9 +235,9 @@ local function get_pane_profile(pane)
 
   -- 5. Check pane title heuristic (e.g. WSL prompt emits user@host:path)
   local title = ''
-  if type(pane.get_title) == 'function' then
+  if type(try_get(pane, 'get_title')) == 'function' then
     pcall(function() title = pane:get_title() or '' end)
-  elseif type(pane.title) == 'string' then
+  elseif type(try_get(pane, 'title')) == 'string' then
     title = pane.title
   end
   if title:find('^[^@]+@[^:]+:') then
@@ -320,9 +331,9 @@ local function get_current_env_and_cwd(pane)
   local profile = get_pane_profile(pane)
 
   local cwd_uri = nil
-  if type(pane.get_current_working_dir) == 'function' then
+  if type(try_get(pane, 'get_current_working_dir')) == 'function' then
     pcall(function() cwd_uri = pane:get_current_working_dir() end)
-  elseif pane.current_working_dir then
+  elseif try_get(pane, 'current_working_dir') then
     cwd_uri = pane.current_working_dir
   end
   local cwd = cwd_uri and cwd_uri.file_path or nil
