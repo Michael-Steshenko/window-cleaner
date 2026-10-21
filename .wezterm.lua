@@ -502,6 +502,20 @@ config.keys = {
       end
     end),
   },
+  -- Shift + Enter: newline in Claude Code. Without the kitty keyboard protocol
+  -- Shift+Enter arrives as a plain Enter, so send ESC+CR (Meta+Enter), which
+  -- Claude Code treats as a newline. Only in WSL: in PowerShell, ESC clears the line.
+  {
+    key = 'Enter',
+    mods = 'SHIFT',
+    action = wezterm.action_callback(function(window, pane)
+      if get_pane_profile(pane) == 'Arch' then
+        window:perform_action(act.SendString '\x1b\r', pane)
+      else
+        window:perform_action(act.SendKey { key = 'Enter', mods = 'SHIFT' }, pane)
+      end
+    end),
+  },
   -- Ctrl + V: Paste from clipboard (like Windows Terminal)
   {
     key = 'v',
