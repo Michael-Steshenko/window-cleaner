@@ -1,3 +1,9 @@
 [Apps]
 ; WezTerm
 terminal = wezterm-gui
+
+[AppleMusic]
+; Path to the packaged yabloko.exe (npm run dist output). Env vars like %USERPROFILE% are expanded.
+YablokoExe = %USERPROFILE%\path\to\yabloko\dist\win-unpacked\yabloko.exe
+; Port of the yabloko control server (default 8787)
+; YablokoPort = 8787

@@ -61,9 +61,12 @@ global LastMinimizedHwnd := 0
     if GetKeyState("LWin")
         Send "{Blind}{LWin Up}"
 
-    ; If no other hotkeys fired between Down and Up, it was a tap
+    ; If no other hotkeys fired between Down and Up, it was a tap.
+    ; SendEvent, not Send (SendInput): an Escape sent via SendInput from this
+    ; PowerToys-triggered hotkey never reaches (not sure why) an active InputHook
+    ; (e.g. Apple Music mode)
     if (A_PriorHotkey = "*F18" && A_TickCount - F18Time < 400)
-        Send "{Escape}"
+        SendEvent "{Escape}"
 }
 
 ; Normalize to *.exe for process matching/launching
@@ -327,6 +330,7 @@ terminalApps := ReadAppList("Terminal")
 *m:: LaunchOrCycle("Thunderbird")
 *v:: LaunchOrCycle("vmware.exe")
 *q:: WinClose("A")
+*a:: AppleMusicMode()
 
 ; Window Management, Hyper + h/j/k/l maps to Win + arrow keys
 
@@ -457,3 +461,5 @@ MoveUpOrUnminimize() {
 *l:: MoveZone("Right")
 
 #HotIf
+
+#Include apple-music.ahk
