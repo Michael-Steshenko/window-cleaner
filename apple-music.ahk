@@ -115,12 +115,18 @@ AppleMusicMode() {
     ShowOSD("Apple Music Mode", , timeout * 1000)
 
     ih := InputHook("L1 T" timeout)
-    ih.KeyOpt("{Esc}", "E") ; Esc quits the mode (EndReason "EndKey")
+    ; Every key ends the mode, so non-text keys (arrows, Tab, ...) can be reported too.
+    ; Modifiers are excluded so Shift+letter still works, and CapsLock/F18 (the Hyper
+    ; key, whose tap sends the Escape that cancels the mode) so they don't end it first
+    ih.KeyOpt("{All}", "E")
+    ih.KeyOpt("{LShift}{RShift}{LCtrl}{RCtrl}{LAlt}{RAlt}{LWin}{RWin}{CapsLock}{F18}", "-E")
     ih.Start()
     ih.Wait()
 
-    key := ih.Input
-    if (key = "a" || key = "A") {
+    key := (ih.EndReason = "EndKey") ? ih.EndKey : ih.Input
+    if (key = "Escape" || ih.EndReason = "Timeout") {
+        ShowOSD("") ; hide OSD
+    } else if (key = "a" || key = "A") {
         AM_LaunchOrFocus()
         ShowOSD("") ; hide OSD
     } else if (key = "f" || key = "F") {
@@ -129,9 +135,7 @@ AppleMusicMode() {
         AM_Action("unfavorite")
     } else if (key = "l" || key = "L") {
         AM_Action("suggest_less")
-    } else if (ih.EndReason = "Max") {
-        ShowOSD("Invalid key: " key, "❌")
     } else {
-        ShowOSD("") ; Esc or timed out, hide OSD
+        ShowOSD("Invalid key: " key, "❌")
     }
 }
