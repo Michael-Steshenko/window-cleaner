@@ -38,7 +38,7 @@ ShowOSD(text, icon := "", duration := 1500) {
     SetTimer(HideOSD, -duration)
 }
 
-; Send an action to the yabloko HTTP server (favorite, undo-favorite, suggest-less)
+; Send an action to the yabloko HTTP server (favorite, undo-favorite, suggest-less, quit)
 AM_Request(action) {
     global ConfigFile
     port := IniRead(ConfigFile, "AppleMusic", "YablokoPort", "8787")
@@ -62,19 +62,20 @@ AM_Action(action) {
     static actions := Map(
         "favorite", {endpoint: "favorite", icon: "★"},
         "unfavorite", {endpoint: "undo-favorite", icon: "☆"},
-        "suggest_less", {endpoint: "suggest-less", icon: "👎"}
+        "suggest_less", {endpoint: "suggest-less", icon: "👎"},
+        "quit", {endpoint: "quit", icon: "⏻"}
     )
     a := actions[action]
     ; Show the icon right away; the request blocks until yabloko answers, so send it from
     ; a timer thread (lets the OSD paint first) and only replace the icon on failure
     ShowOSD(a.icon)
-    SetTimer(() => AM_ReportResult(AM_Request(a.endpoint)), -1)
+    SetTimer(() => AM_ReportResult(AM_Request(a.endpoint), action), -1)
 }
 
-AM_ReportResult(result) {
+AM_ReportResult(result, action) {
     switch result {
         case "done": return
-        case "NO_SERVER": ShowOSD("Start Yabloko", "❌")
+        case "NO_SERVER": ShowOSD(action = "quit" ? "Yabloko not running" : "Start Yabloko", "❌")
         case "NO_PAGE": ShowOSD("Nothing playing", "❌")
         case "NOT_READY": ShowOSD("Yabloko not ready", "❌")
         default: ShowOSD("Failed", "❌")
@@ -135,6 +136,8 @@ AppleMusicMode() {
         AM_Action("unfavorite")
     } else if (key = "l" || key = "L") {
         AM_Action("suggest_less")
+    } else if (key = "q" || key = "Q") {
+        AM_Action("quit")
     } else {
         ShowOSD("Invalid key: " key, "❌")
     }
