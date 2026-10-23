@@ -84,16 +84,19 @@ now we can use the git command from command prompt and powershell.
 To be able to authenticate via the browser we can set git credential manager:  
 `git config --global credential.helper manager`
 
+#### Using MinGit's credential manager from WSL
+
+Configure the WSL version of git to use the Windows git credential manager (this allows you to sign in through the browser and remembers your credentials). Run in WSL:  
+`git config --global credential.helper "/mnt/c/Users/Michael/AppData/Local/Microsoft/WinGet/Packages/Git.MinGit_Microsoft.Winget.Source_8wekyb3d8bbwe/ucrt64/bin/git-credential-manager.exe"`  
+(older MinGit versions used `mingw64` instead of `ucrt64` in this path, check which folder exists if it fails)  
+taken from [here](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md#configuring-wsl-with-git-for-windows-recommended)
+
 ### VSCode WSL extension
 
 This lets you run VS Code’s UI on Windows, and all your commands, extensions, and even the terminal, run on Linux.
 
 - Install the WSL extension in VS code.
-- Configure the WSL version of git, to use the windows version of git credential manager.  
-   (this allows you to sign in through the browsers and remembers your credentials)  
-   If you use mingit the command will look something like this:  
-   `git config --global credential.helper "/mnt/c/Users/Michael/AppData/Local/Microsoft/WinGet/Packages/Git.MinGit_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/git-credential-manager.exe"`  
-  taken from [here](https://github.com/git-ecosystem/git-credential-manager/blob/main/docs/wsl.md#configuring-wsl-with-git-for-windows-recommended)
+- To sign in to git from WSL, see [Using MinGit's credential manager from WSL](#using-mingits-credential-manager-from-wsl).
 
 ### WezTerm
 
