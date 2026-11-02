@@ -180,22 +180,13 @@ NavigateToWindow(target) {
         MoveCursorToWindowCenter(target)
 }
 
-; Function to launch or cycle through app windows
-LaunchOrCycle(apps) {
-    apps := (Type(apps) = "String") ? [apps] : apps
-
-    ; Build a set of target exe names (with special cases)
-    exeSet := Map()
-    for app in apps {
-        exe := StrLower(NormalizeExe(app))
-        exeSet[(exe = "wt.exe") ? "windowsterminal.exe" : exe] := true
-    }
-
-    allWindows := []
+; Get the target app's real windows on the current VD in Z-order,
+; and report whether any exist on another VD
+FindAppWindows(exeSet, &existsOnOtherVD := false) {
+    windows := []
     existsOnOtherVD := false
     hasExplorer := exeSet.Has("explorer.exe")
 
-    ; Get all windows in Z-order, filter to our target apps
     DetectHiddenWindows true
     for hwnd in WinGetList() {
         try {
@@ -206,15 +197,33 @@ LaunchOrCycle(apps) {
                 if (!IsWindowOnCurrentDesktop(hwnd))
                     existsOnOtherVD := true
                 else if (IsRealWindow(hwnd))
-                    allWindows.Push(hwnd)
+                    windows.Push(hwnd)
             }
         }
     }
     DetectHiddenWindows false
+    return windows
+}
+
+; Function to launch or cycle through app windows.
+; newWindowOnOtherDesktop: if the app only has windows on other VDs, launch it again
+; to open a new window on the current VD (e.g. Chrome) instead of showing a tooltip.
+; Only use for apps that open a new window when launched while already running.
+LaunchOrCycle(apps, newWindowOnOtherDesktop := false) {
+    apps := (Type(apps) = "String") ? [apps] : apps
+
+    ; Build a set of target exe names (with special cases)
+    exeSet := Map()
+    for app in apps {
+        exe := StrLower(NormalizeExe(app))
+        exeSet[(exe = "wt.exe") ? "windowsterminal.exe" : exe] := true
+    }
+
+    allWindows := FindAppWindows(exeSet, &existsOnOtherVD)
 
     ; No windows on current VD
     if (allWindows.Length = 0) {
-        if (existsOnOtherVD) {
+        if (existsOnOtherVD && !newWindowOnOtherDesktop) {
             CoordMode("ToolTip", "Screen")
             MonitorGetWorkArea(MonitorGetPrimary(), &left, &top, &right, &bottom)
             ToolTip("App is on another desktop", left + (right - left) // 2 - 113, top + (bottom - top) // 2 + 22)
@@ -222,23 +231,19 @@ LaunchOrCycle(apps) {
         } else {
             try {
                 Run(ExpandEnvVars(apps[1]))
-                ; Wait for window to appear and focus it
-                waitTitle := hasExplorer ? "ahk_class CabinetWClass" : ""
-                if (waitTitle != "") {
-                    if (hwnd := WinWait(waitTitle, , 3)) {
+                ; Wait for a window to appear on the current VD and focus it.
+                ; Only windows on the current VD count, otherwise an existing window
+                ; on another VD would match and activating it would switch desktops.
+                deadline := A_TickCount + 3000
+                while (A_TickCount < deadline) {
+                    if ((windows := FindAppWindows(exeSet)).Length) {
+                        hwnd := windows[1]
                         WinActivate("ahk_id " hwnd)
                         WinWaitActive("ahk_id " hwnd, , 1)
                         MoveCursorToWindowCenter(hwnd)
+                        break
                     }
-                } else {
-                    for exe in exeSet {
-                        if (hwnd := WinWait("ahk_exe " exe, , 3)) {
-                            WinActivate("ahk_id " hwnd)
-                            WinWaitActive("ahk_id " hwnd, , 1)
-                            MoveCursorToWindowCenter(hwnd)
-                            break
-                        }
-                    }
+                    Sleep 50
                 }
             }
         }
@@ -319,14 +324,14 @@ terminalApps := ReadAppList("Terminal")
 
 ; Hyper Key combinations
 *1:: LaunchOrCycle("1Password")
-*2:: LaunchOrCycle(["Chrome", "MSEdge"])
-*3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName])
-*4:: LaunchOrCycle(terminalApps)
+*2:: LaunchOrCycle(["Chrome", "MSEdge"], true)
+*3:: LaunchOrCycle([VSCodePath, VisualStudioProcessName], true)
+*4:: LaunchOrCycle(terminalApps, true)
 *5:: LaunchOrCycle(EnvGet("LOCALAPPDATA") "\Programs\Obsidian\Obsidian.exe")
 ; For discord the path does not match the app name,
 ; we need to provide both the path to "Update.exe" and "Discord"
 *t:: LaunchOrCycle([EnvGet("LOCALAPPDATA") "\Discord\Update.exe --processStart Discord.exe", "Discord"])
-*e:: LaunchOrCycle("explorer.exe")
+*e:: LaunchOrCycle("explorer.exe", true)
 *m:: LaunchOrCycle("Thunderbird")
 *v:: LaunchOrCycle("vmware.exe")
 *q:: WinClose("A")
