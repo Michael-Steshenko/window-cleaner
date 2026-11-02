@@ -338,7 +338,6 @@ terminalApps := ReadAppList("Terminal")
 *a:: AppleMusicMode()
 
 ; Window Management, Hyper + h/j/k/l maps to Win + arrow keys
-
 MoveZone(dir) {
     try {
         hwnd := WinGetID("A")
