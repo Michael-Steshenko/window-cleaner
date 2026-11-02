@@ -152,11 +152,39 @@ local function try_get(obj, key)
   return nil
 end
 
+-- A pane's shell never changes, so its profile is detected once and cached by pane id.
+-- Detection walks the process tree, which WezTerm builds recursively; doing that every
+-- update-status tick while a build spawns hundreds of processes (with Windows reusing
+-- PIDs) overflowed wezterm-gui's stack and crashed the whole window.
+local profile_cache = {}
+
+local function get_pane_id(pane)
+  local id = try_get(pane, 'pane_id')
+  if type(id) == 'function' then
+    local ok, value = pcall(function() return pane:pane_id() end)
+    return ok and value or nil
+  end
+  return id
+end
+
+local detect_pane_profile
+
 local function get_pane_profile(pane)
   if not pane then
     return 'PowerShell'
   end
+  local id = get_pane_id(pane)
+  if id and profile_cache[id] then
+    return profile_cache[id]
+  end
+  local profile = detect_pane_profile(pane)
+  if id then
+    profile_cache[id] = profile
+  end
+  return profile
+end
 
+detect_pane_profile = function(pane)
   -- 1. Check WSL / domain name (e.g. WSL:archlinux)
   local domain = ''
   if type(try_get(pane, 'get_domain_name')) == 'function' then
@@ -369,6 +397,9 @@ wezterm.on('spawn-window-current-env', function(window, pane)
     args = args,
     cwd = cwd,
   }
+  if mux_pane and profile then
+    profile_cache[mux_pane:pane_id()] = profile
+  end
   if mux_tab and profile then
     mux_tab:set_title(profile)
   end
@@ -380,6 +411,9 @@ wezterm.on('spawn-tab-current-env', function(window, pane)
     args = args,
     cwd = cwd,
   }
+  if mux_pane and profile then
+    profile_cache[mux_pane:pane_id()] = profile
+  end
   if mux_tab and profile then
     mux_tab:set_title(profile)
   end
